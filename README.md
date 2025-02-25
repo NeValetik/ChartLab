@@ -4,11 +4,11 @@ SQL like syntax
 Vn = {
 	<table>, <query>, <chart>, <var>, <function>, <dataType<>>, <string>, <char>,
 	<operationType<>>, <declaration>, <logicalOperand<>>, <chartType>, <row>,
-	<column>, <int>, <float>, <assignment>, <list>, <value>, <global>, <with>
+	<column>, <int>, <float>, <assignment>, <list<>>, <value>, <global>, <with>, <keyword<>>, <and>
 	// expandable  
 }
 Vt = {
-	A..Z, a..z, 0..9, /, ", `, ', _, +, -, ;, {, }, [, ], !, %, (, ), #, =, ?, :, |, \  
+	A..Z, a..z, 0..9, /, ", `, ', _, +, -, ;, {, }, [, ], !, %, (, ), #, =, ?, :, |, \, &, *,   
 }
 ```
 
@@ -27,9 +27,10 @@ with data from table.extension chart:
 Token Decomposition
 ```dsl 
 <global>
-<var> <operationType> <value<list<dataType>>> <endLine>
+<var> <operationType> <value<list<dataType>>> <chart> <endLine>
 <with><var><from><table><begin>
-<query>
+	<keyword><value><and><value>
+	<keyword><and><keyword>
 <end>
 <globalEnd>
 ```
