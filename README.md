@@ -2,14 +2,14 @@
 ## In our DSL:
 * Keywords - special reserved words with fixed meanings in the language
   * "data" (declares variables)
-  * "with data from" (declares the table)
+  * "with $data from" (declares the table)
   * "chart" (signals chart creation)
   * "compare", "log", etc. (specific keywords for each chart type)
 
 Example:
 ```
-data = sales, revenue;   // "data" is a keyword
-with data from finance chart:  // "with data from" is a keyword
+data = sales, revenue;   // "$data" is a keyword
+with data from finance chart:  // "with $data from" is a keyword
     compare sales and revenue; // "compare" is a keyword
 ```
 
@@ -35,6 +35,12 @@ Must start with a letter and can contain letters, numbers, underscores.
 ```
 data = sales, revenue;  // "sales" and "revenue" are identifiers
 with data from finance chart:  // "finance" is an identifier
+```
+
+* Another way of using Identifiers:
+```
+data = * from finance; // where "*" means everything should be considered.
+with data chart:
 ```
 
 # Example Chart Definitions
@@ -71,7 +77,7 @@ Best for comparing TOTALS across cases and subsets within cases.
 
 ```
 with data from complaints chart:
-    show harassment complaints stacked by region for healthcare, finance, and retail
+    show harassment complaints stacked by region for healthcare, finance, retail
 
 ```
 
