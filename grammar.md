@@ -41,6 +41,8 @@
 
 <loop> ::= "while" "(" <condition> ")" ":"
 
+<conditionalStatement> ::= "if" "("<condition>")" ":"
+
 <condition> ::= ["!"] [ "(" ] {"!"} <logicalOperation> { ("and" | "or") {"!"} <logicalOperation> } [ ")" ]
 
 <logicalOperation> ::= [ "(" ] <operationBody> [ ")" ] <logicalOperationSign> [ "(" ] <operationBody> [ ")" ]
