@@ -39,6 +39,13 @@
 
 <range> ::= <identifier> "to" <identifier>
 
+<loop> ::= "while" "(" <condition> ")" ":"
+
+<condition> ::= {"!"}{"("}<logicalOperation> ["and"|"or" <logicalOperation> ]{")"}
+<logicalOperation> ::= {"("}<operationBody>{")"} "<"|"<="|">"|">="|"=="|"!=" <operationBody>{")"}
+<operationBody> ::= {"("}<operation>{")"} [<operationSign>{"("}<operation>{")"}]
+<operation> ::= <identifier> {<operationSign> <identifier>}
+
 <subgroup> ::= <identifier>
 <cases> ::= <identifier>
 <identifier> ::=  <letter> | <letter> <identifier> | <identifier> <digit>

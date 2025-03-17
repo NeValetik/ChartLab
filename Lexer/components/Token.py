@@ -1,4 +1,4 @@
-from Lexer.components.TokenTypes.TokenType import *
+from Lexer.components.TokenType import *
 
 class Token:
   
