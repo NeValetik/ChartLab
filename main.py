@@ -1,1 +1,3 @@
-from Lexer import *
+from Lexer.Lexer import *
+
+print("this is main")
