@@ -43,13 +43,14 @@
 
 <condition> ::= ["!"] [ "(" ] <logicalOperation> { ("and" | "or") <logicalOperation> } [ ")" ]
 
-<logicalOperation> ::= [ "(" ] <operationBody> [ ")" ] ("<" | "<=" | ">" | ">=" | "==" | "!=") [ "(" ] <operationBody> [ ")" ]
+<logicalOperation> ::= [ "(" ] <operationBody> [ ")" ] <logicalOperationSign> [ "(" ] <operationBody> [ ")" ]
 
 <operationBody> ::= [ "(" ] <operation> [ ")" ] { <operationSign> [ "(" ] <operation> [ ")" ] }
 
 <operation> ::= <identifier> [ <operationSign> <identifier> ]
 
 <operationSign> ::= "+" | "-" | "*" | "/"
+<logicalOperationSign> ::= "<" | "<=" | ">" | ">=" | "==" | "!="
 
 <subgroup> ::= <identifier>
 <cases> ::= <identifier>
