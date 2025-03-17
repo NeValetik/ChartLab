@@ -51,6 +51,21 @@ and operations.
 
 <range> ::= <identifier> "to" <identifier>
 
+<loop> ::= "while" "(" <condition> ")" ":"
+
+<conditionalStatement> ::= "if" "("<condition>")" ":"
+
+<condition> ::= ["!"] [ "(" ] {"!"} <logicalOperation> { ("and" | "or") {"!"} <logicalOperation> } [ ")" ]
+
+<logicalOperation> ::= [ "(" ] <operationBody> [ ")" ] <logicalOperationSign> [ "(" ] <operationBody> [ ")" ]
+
+<operationBody> ::= [ "(" ] <operation> [ ")" ] { <operationSign> [ "(" ] <operation> [ ")" ] }
+
+<operation> ::= <identifier> [ <operationSign> <identifier> ]
+
+<operationSign> ::= "+" | "-" | "*" | "/"
+<logicalOperationSign> ::= "<" | "<=" | ">" | ">=" | "==" | "!="
+
 <subgroup> ::= <identifier>
 <cases> ::= <identifier>
 <identifier> ::=  <letter> | <letter> <identifier> | <identifier> <digit>
