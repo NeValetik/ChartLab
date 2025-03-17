@@ -41,10 +41,15 @@
 
 <loop> ::= "while" "(" <condition> ")" ":"
 
-<condition> ::= {"!"}{"("}<logicalOperation> ["and"|"or" <logicalOperation> ]{")"}
-<logicalOperation> ::= {"("}<operationBody>{")"} "<"|"<="|">"|">="|"=="|"!=" <operationBody>{")"}
-<operationBody> ::= {"("}<operation>{")"} [<operationSign>{"("}<operation>{")"}]
-<operation> ::= <identifier> {<operationSign> <identifier>}
+<condition> ::= ["!"] [ "(" ] <logicalOperation> { ("and" | "or") <logicalOperation> } [ ")" ]
+
+<logicalOperation> ::= [ "(" ] <operationBody> [ ")" ] ("<" | "<=" | ">" | ">=" | "==" | "!=") [ "(" ] <operationBody> [ ")" ]
+
+<operationBody> ::= [ "(" ] <operation> [ ")" ] { <operationSign> [ "(" ] <operation> [ ")" ] }
+
+<operation> ::= <identifier> [ <operationSign> <identifier> ]
+
+<operationSign> ::= "+" | "-" | "*" | "/"
 
 <subgroup> ::= <identifier>
 <cases> ::= <identifier>
