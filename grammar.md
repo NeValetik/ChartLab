@@ -1,65 +1,69 @@
-
 ```
-<command> ::= "with data from" <table> "chart:" <chartFunction> 
-<chartFunction> ::= "compare" <var> "for" <cases> #HERE STARTS BAR CHART
-                 | "differences" <var> "for" <cases> 
-                 | "contrast" <var> "for" <cases> 
-                 | "versus" <var> "for" <cases>
-                
-                 | "compare" <var> "split by" <subgroup> "for" <cases> #BAR CHART (GROUPED)
-                 | "compare" <var> "grouped by" <subgroup> "for" <cases>
-                 | "differences within" <subgroup> "for" <cases>
-               
-                 | "show" <var> "stacked by" <subgroup> "for" <cases> #BAR CHART (STACKED)
-                 | "show" <var> "subgroups" <subgroup> "for" <cases>
-               
-                 | "show correlation between" <continuousVar> "and" <continuousVar>  # Line Graph (2 variables)
-                 | "log" <trendKeyword> <continuousVar> "from" <range>  # Line Graph (Trend)
-                 
-                 | "show proportion of" <var> by <cases> #PIE CHART
-                 | "show share of" <var> by <cases> 
-                 | "show percentage of" <var> by <cases> 
-                 
-                 | "show frequency of" <var> "by" <range>  # HISTOGRAM
-                 | "show distribution of" <var> "by" <range> 
-                 | "show frequency in" <range> "buckets" 
-                 
-                 | "accumulation of" <continuousVar> "for" <cases> "from" <range>  # AREA CHART (Accumulation)
-                 | "stacked trend of" <continuousVar> "for" <cases>  # AREA CHART (Stacked Trend)
-                 
-                 | "scatter plot of" <var> "and" <var>  #SCATTER PLOT
-                 | "pattern of" <var> "and" <var> 
-                 
-                 | "bubble of" <var> "," <var> "," <var> "for" <cases>  # BUBBLE CHART
+<command> ::= "with data from" <table> "chart:" <chartFunction>
+
+<chartFunction> ::= "compare" <var> "for" <cases>  
+                 | "differences" <var> "for" <cases>  
+                 | "contrast" <var> "for" <cases>  
+                 | "versus" <var> "for" <cases>  
+                 | "compare" <var> "split by" <subgroup> "for" <cases>  
+                 | "compare" <var> "grouped by" <subgroup> "for" <cases>  
+                 | "differences within" <subgroup> "for" <cases>  
+                 | "show" <var> "stacked by" <subgroup> "for" <cases>  
+                 | "show" <var> "subgroups" <subgroup> "for" <cases>  
+                 | "show correlation between" <continuousVar> "and" <continuousVar>  
+                 | "log" <trendKeyword> <continuousVar> "from" <range>  
+                 | "show proportion of" <var> "by" <cases>  
+                 | "show share of" <var> "by" <cases>  
+                 | "show percentage of" <var> "by" <cases>  
+                 | "show frequency of" <var> "by" <range>  
+                 | "show distribution of" <var> "by" <range>  
+                 | "show frequency in" <range> "buckets"  
+                 | "accumulation of" <continuousVar> "for" <cases> "from" <range>  
+                 | "stacked trend of" <continuousVar> "for" <cases>  
+                 | "scatter plot of" <var> "and" <var>  
+                 | "pattern of" <var> "and" <var>  
+                 | "bubble of" <var> "," <var> "," <var> "for" <cases>
 
 <table> ::= <identifier>
+
 <var> ::= <identifier>
+
 <continuousVar> ::= <identifier> | <identifier> "," <continuousVar>
-<continuousCases ::= <identifier> | <identifier> "," <continuousVar>
+
+<continuousCases> ::= <identifier> | <identifier> "," <continuousVar>
 
 <range> ::= <identifier> "to" <identifier>
 
 <loop> ::= "while" "(" <condition> ")" ":"
 
-<conditionalStatement> ::= "if" "("<condition>")" ":"
+<conditionalStatement> ::= "if" "(" <condition> ")" ":"
 
-<condition> ::= ["!"] [ "(" ] {"!"} <logicalOperation> { ("and" | "or") {"!"} <logicalOperation> } [ ")" ]
+<condition> ::= <logicalOperation>
+              | "!" <condition>
+              | <condition> ("and" | "or") <condition>
+              | "(" <condition> ")"
 
-<logicalOperation> ::= [ "(" ] <operationBody> [ ")" ] <logicalOperationSign> [ "(" ] <operationBody> [ ")" ]
+<logicalOperation> ::= <operationBody> <logicalOperationSign> <operationBody>
 
-<operationBody> ::= [ "(" ] <operation> [ ")" ] { <operationSign> [ "(" ] <operation> [ ")" ] }
+<operationBody> ::= <operation>
+                  | "(" <operation> ")"
+                  | <operationBody> <operationSign> <operationBody>
 
-<operation> ::= <identifier> [ <operationSign> <identifier> ]
+<operation> ::= <identifier> | <identifier> <operationSign> <identifier>
 
 <operationSign> ::= "+" | "-" | "*" | "/"
+
 <logicalOperationSign> ::= "<" | "<=" | ">" | ">=" | "==" | "!="
 
 <subgroup> ::= <identifier>
+
 <cases> ::= <identifier>
-<identifier> ::=  <letter> | <letter> <identifier> | <identifier> <digit>
+
+<identifier> ::= <letter> | <letter> <identifier> | <identifier> <digit>
 
 <trendKeyword> ::= "progression of" | "trend of" | "growth of"
 
-<letter> ::= a|b|...|z|A|B|...|Z
-<digit> ::= 0|1|...|9
+<letter> ::= "a"|"b"|...|"z"|"A"|"B"|...|"Z"
+
+<digit> ::= "0" | "1" |...| "9"
 ```

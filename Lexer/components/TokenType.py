@@ -1,10 +1,4 @@
-from abc import ABC, abstractmethod
+from enum import Enum
 
-class TokenType(ABC):
-
-  def __init__(self, token):
-    self._token = token
-
-  @abstractmethod
-  def interpret(self):
-    pass
+class TokenType(Enum):
+  
