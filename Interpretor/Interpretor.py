@@ -1,3 +1,3 @@
 class Interpretor:
-  def __init__(self,**args):
-    pass
+    def __init__(self, **args):
+        pass

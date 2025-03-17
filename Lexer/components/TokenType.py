@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class TokenType(Enum):
     # Keywords
     WITH_DATA_FROM = 1
