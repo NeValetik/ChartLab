@@ -186,3 +186,13 @@ with data from economy chart:
     bubble of GDP, life expectancy, and population for countries;
 ```
 
+Example of loop and conditional statement
+```
+i = 0
+x = 1,2,3,4,5,6,7
+while (i < 10) :
+    with x at i from economy chart:
+        bubble of GDP, life expectancy, and population for countries;
+    i = i + 1
+```
+
