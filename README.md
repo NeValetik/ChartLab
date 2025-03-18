@@ -187,12 +187,21 @@ with data from economy chart:
 ```
 
 Example of loop and conditional statement
+Where i could be the time segment.
 ```
 i = 0
-x = 1,2,3,4,5,6,7
+x = col...
 while (i < 10) :
     with x at i from economy chart:
-        bubble of GDP, life expectancy, and population for countries;
+        scatter plot of col 
     i = i + 1
+```
+If:
+```
+x = 0
+if(1+2<3):
+    x = 10
+else:
+    x = 1    
 ```
 
