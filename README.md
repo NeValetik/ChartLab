@@ -186,7 +186,7 @@ with data from economy chart:
     bubble of GDP, life expectancy, and population for countries;
 ```
 
-Example of loop and conditional statement
+# Example of loop and conditional statement
 Where i could be the time segment.
 ```
 i = 0
@@ -196,7 +196,8 @@ while (i < 10) :
         scatter plot of col 
     i = i + 1
 ```
-If:
+
+# If statement
 ```
 x = 0
 if(1+2<3):
