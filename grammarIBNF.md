@@ -1,6 +1,6 @@
 
 ```
-<command> ::= "with data from" <table> "chart:" <chartFunction> 
+<command> ::= "with" <data> "from" <table> "chart:" <chartFunction> 
 <chartFunction> ::= "compare" <var> "for" <cases> #HERE STARTS BAR CHART
                  | "differences" <var> "for" <cases> 
                  | "contrast" <var> "for" <cases> 
@@ -33,7 +33,11 @@
                  | "bubble of" <var> "," <var> "," <var> "for" <cases>  # BUBBLE CHART
 
 <table> ::= <identifier>
+
 <var> ::= <identifier>
+
+<data> ::= <var> | <continuousVar> | <var> "at" <var>
+
 <continuousVar> ::= <identifier> | <identifier> "," <continuousVar>
 
 <range> ::= <identifier> "to" <identifier>

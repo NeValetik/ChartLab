@@ -12,7 +12,7 @@ and operations.
 ## Grammar Structure
 
 ```
-<command> ::= "with data from" <table> "chart:" <chartFunction>
+<command> ::= "with" <data> "from" <table> "chart:" <chartFunction>
 
 <chartFunction> ::= "compare" <var> "for" <cases>  
                  | "differences" <var> "for" <cases>  
@@ -38,6 +38,8 @@ and operations.
                  | "bubble of" <var> "," <var> "," <var> "for" <cases>
 
 <table> ::= <identifier>
+
+<data> ::= <var> | <continuousVar> | <var> "at" <var>
 
 <var> ::= <identifier>
 
@@ -187,7 +189,7 @@ with data from economy chart:
 ```
 
 # Example of loop and conditional statement
-Where i could be the time segment.
+Where ```i``` could be the time segment.
 ```
 i = 0
 x = col...

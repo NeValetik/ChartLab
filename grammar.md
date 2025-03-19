@@ -1,5 +1,5 @@
 ```
-<command> ::= <startProgram> "with data from" <table> "chart:" <chartFunction> <endProgram>
+<command> ::= <startProgram> "with" <data> "from" <table> "chart:" <chartFunction> <endProgram>
 <startProgram> ::= "BEGIN"
 <endProgram> ::= "END"
 <chartFunction> ::= "compare" <var> "for" <cases>  
@@ -26,6 +26,8 @@
                  | "bubble of" <var> "," <var> "," <var> "for" <cases>
 
 <table> ::= <identifier>
+
+<data> ::= <var> | <continuousVar> | <var> "at" <var>
 
 <var> ::= <identifier>
 
