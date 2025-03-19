@@ -189,7 +189,7 @@ with data from economy chart:
 ```
 
 # Example of loop and conditional statement
-Where ```i``` could be the time segment.
+Where ```i``` could be the time/position/name segment.
 ```
 i = 0
 x = col...
