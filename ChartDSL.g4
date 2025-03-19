@@ -1,6 +1,6 @@
-grammar ChartLab;
+grammar ChartDSL;
 
-command: START_PROGRAM 'with data from' table 'chart:' chartFunction END_PROGRAM;
+command: START_PROGRAM 'with' data 'from' table 'chart:' chartFunction END_PROGRAM;
 
 START_PROGRAM: 'BEGIN';
 END_PROGRAM: 'END';
@@ -32,6 +32,9 @@ chartFunction:
 
 table: IDENTIFIER;
 var: IDENTIFIER;
+
+data: var | continuousVar | var 'at' var;
+
 subgroup: IDENTIFIER;
 cases: IDENTIFIER;
 
