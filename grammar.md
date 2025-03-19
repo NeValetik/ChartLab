@@ -31,8 +31,6 @@
 
 <continuousVar> ::= <identifier> | <identifier> "," <continuousVar>
 
-<continuousCases> ::= <identifier> | <identifier> "," <continuousVar>
-
 <range> ::= <identifier> "to" <identifier>
 
 <loop> ::= "while" "(" <condition> ")" ":"
