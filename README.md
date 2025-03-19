@@ -205,3 +205,14 @@ else:
     x = 1    
 ```
 
+
+# Derivation Tree
+The code used for the derivation tree is for the Bar Chart (Grouped/Split), that compares a variable split into subsets, across various cases (for
+example salary for both men and women in x companies). 
+
+```
+with data from industry chart:
+    compare salary split by gender for company
+```
+
+![derivationTree.png](derivationTree.png)
