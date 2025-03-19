@@ -1,5 +1,5 @@
-from Lexer.components.Token import *
-from Lexer.components.TokenType import *
+from lexer.components.Token import *
+from lexer.components.TokenType import *
 
 
 class Lexer:
