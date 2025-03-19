@@ -1,6 +1,7 @@
 ```
-<command> ::= "with data from" <table> "chart:" <chartFunction>
-
+<command> ::= <startProgram> "with data from" <table> "chart:" <chartFunction> <endProgram>
+<startProgram> ::= "BEGIN"
+<endProgram> ::= "END"
 <chartFunction> ::= "compare" <var> "for" <cases>  
                  | "differences" <var> "for" <cases>  
                  | "contrast" <var> "for" <cases>  
@@ -29,8 +30,6 @@
 <var> ::= <identifier>
 
 <continuousVar> ::= <identifier> | <identifier> "," <continuousVar>
-
-<continuousCases> ::= <identifier> | <identifier> "," <continuousVar>
 
 <range> ::= <identifier> "to" <identifier>
 
