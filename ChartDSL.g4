@@ -15,35 +15,34 @@ chartFunction:
     | 'differences within' subgroup 'for' cases
     | 'show' var 'stacked by' subgroup 'for' cases
     | 'show' var 'subgroups' subgroup 'for' cases
-    | 'show correlation between' continuousVar 'and' continuousVar
-    | 'log' trendKeyword continuousVar 'from' range
+    | 'show correlation between' continuousIdentifier 'and' continuousIdentifier
+    | 'log' trendKeyword continuousIdentifier 'from' range
     | 'show proportion of' var 'by' cases
     | 'show share of' var 'by' cases
     | 'show percentage of' var 'by' cases
     | 'show frequency of' var 'by' range
     | 'show distribution of' var 'by' range
     | 'show frequency in' range 'buckets'
-    | 'accumulation of' continuousVar 'for' cases 'from' range
-    | 'stacked trend of' continuousVar 'for' cases
+    | 'accumulation of' continuousIdentifier 'for' cases 'from' range
+    | 'stacked trend of' continuousIdentifier 'for' cases
     | 'scatter plot of' var 'and' var
     | 'pattern of' var 'and' var
     | 'bubble of' var ',' var ',' var 'for' cases
     ;
 
 table: IDENTIFIER;
+
+data: var | continuousIdentifier | var 'at' var;
+
 var: IDENTIFIER;
+definition: var '=' IDENTIFIER | var '=' continuousIdentifier;
 
-data: var | continuousVar | var 'at' var;
+continuousIdentifier:  IDENTIFIER | IDENTIFIER ',' continuousIdentifier;
 
-subgroup: IDENTIFIER;
-cases: IDENTIFIER;
-
-continuousVar: IDENTIFIER (',' IDENTIFIER)*;
 range: IDENTIFIER 'to' IDENTIFIER;
 
-trendKeyword: 'progression of' | 'trend of' | 'growth of';
-
 loop: 'while' '(' condition ')' ':';
+
 
 conditionalStatement: 'if' '(' condition ')';
 
@@ -64,7 +63,12 @@ operationSign:  '+' | '-' | '*' | '/';
 
 logicalOperationSign: '<' | '<=' | '>' | '>=' | '==' | '!=';
 
+subgroup: IDENTIFIER;
+cases: IDENTIFIER;
+
 IDENTIFIER: LETTER (LETTER | DIGIT)*;
+
+trendKeyword: 'progression of' | 'trend of' | 'growth of';
 
 fragment LETTER: [a-zA-Z];
 fragment DIGIT: [0-9];

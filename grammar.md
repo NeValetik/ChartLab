@@ -11,23 +11,23 @@
                  | "differences within" <subgroup> "for" <cases>  
                  | "show" <var> "stacked by" <subgroup> "for" <cases>  
                  | "show" <var> "subgroups" <subgroup> "for" <cases>  
-                 | "show correlation between" <continuousVar> "and" <continuousVar>  
-                 | "log" <trendKeyword> <continuousVar> "from" <range>  
+                 | "show correlation between" <continuousIdentifier> "and" <continuousVar>  
+                 | "log" <trendKeyword> <continuousIdentifier> "from" <range>  
                  | "show proportion of" <var> "by" <cases>  
                  | "show share of" <var> "by" <cases>  
                  | "show percentage of" <var> "by" <cases>  
                  | "show frequency of" <var> "by" <range>  
                  | "show distribution of" <var> "by" <range>  
                  | "show frequency in" <range> "buckets"  
-                 | "accumulation of" <continuousVar> "for" <cases> "from" <range>  
-                 | "stacked trend of" <continuousVar> "for" <cases>  
+                 | "accumulation of" <continuousIdentifier> "for" <cases> "from" <range>  
+                 | "stacked trend of" <continuousIdentifier> "for" <cases>  
                  | "scatter plot of" <var> "and" <var>  
                  | "pattern of" <var> "and" <var>  
                  | "bubble of" <var> "," <var> "," <var> "for" <cases>
 
 <table> ::= <identifier>
 
-<data> ::= <var> | <continuousVar> | <var> "at" <var>
+<data> ::= <var> | <continuousIdentifier> | <var> "at" <var>
 
 <var> ::= <identifier>
 <definition> ::= <var> "=" <identifier> | <var> "=" <continuousIdentifier>
