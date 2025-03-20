@@ -30,8 +30,9 @@
 <data> ::= <var> | <continuousVar> | <var> "at" <var>
 
 <var> ::= <identifier>
+<definition> ::= <var> "=" <identifier> | <var> "=" <continuousIdentifier>
 
-<continuousVar> ::= <identifier> | <identifier> "," <continuousVar>
+<continuousIdentifier> ::= <identifier> | <identifier> "," <continuousVar>
 
 <range> ::= <identifier> "to" <identifier>
 
