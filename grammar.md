@@ -32,7 +32,7 @@
 <var> ::= <identifier>
 <definition> ::= <var> "=" <identifier> | <var> "=" <continuousIdentifier>
 
-<continuousIdentifier> ::= <identifier> | <identifier> "," <continuousVar>
+<continuousIdentifier> ::= <identifier> | <identifier> "," <continuousIdentifier>
 
 <range> ::= <identifier> "to" <identifier>
 
