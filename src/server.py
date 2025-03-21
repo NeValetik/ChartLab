@@ -21,13 +21,12 @@ def list_files():
     if not os.path.exists(repo_path):
         return "Repository not found", 404
     
-    files_content = {}
+    files_content = []
     for filename in os.listdir(repo_path):
         file_path = os.path.join(repo_path, filename)
         if os.path.isfile(file_path):
             with open(file_path, 'r', encoding='utf-8') as file:
-                files_content[filename] = file.read()
-    
+                files_content.append({"key":filename,"code": file.read(), "label":filename})
     return jsonify(files_content)
 
 if __name__ == '__main__':
