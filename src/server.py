@@ -8,11 +8,10 @@ app = Flask(__name__)
 def generate_image():
     content = request.data.decode('utf-8')
     print(content)
-    # if not content:
-    #     return "No text provided", 400
+    if not content:
+        return "No text provided", 400
 
-    # image_path = create_chart(content)
-    image_path = "data/img/example.png"
+    image_path = create_chart(content)
     return send_file(image_path, mimetype='image/png')
 
 @app.route('/api/v1/files', methods=['GET'])

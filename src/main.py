@@ -1,24 +1,36 @@
-# Even if we don't use some of them, lasa sa fie
+# Custom components (even if we are not using lexer and parser)
 from lexer.Lexer import *
 from parser.Parser import *
 from interpretor.Interpretor import *
 
+# ANTLR components
+from antlr4 import *
+from antlr.ChartLexer import ChartLexer
+from antlr.ChartParser import ChartParser
+from antlr.visualize import *
+
 from PIL import Image  # To open the image
 
 def create_chart(content):
-    # This function will be called by our server
-    # Here we'll call all of the components
+    # This function basically repeates the antlr/test.py
 
-    # Calling lexer and parser, in our case ANTLR, which return AST
-    # Calling interperter on AST
+    input_stream = InputStream(content)
+    lexer = ChartLexer(input_stream)
+    token_stream = CommonTokenStream(lexer)
+    token_stream.fill()
 
-    # Need to look smth like these:
-    # ast = Antlr.get_ast(conetnt)
-    # Interpreter.interpret(ast)
+    print_tokens(token_stream.tokens)
 
-    # Saving the image (in img directory) and returing the path to it
-    # (last comment is a temporar solution)
-    pass
+    parser = ChartParser(token_stream)
+    tree = parser.command()
+
+    print("\n\033[1;32mParse Tree:\033[0m")
+    print_parse_tree(tree, parser)
+
+    # Temporar solution: our interpreter will return path of the generated image
+    # img_path = Interpretor.interpret(tree)
+    img_path = "data/img/example1.png"
+    return img_path
 
 
 if __name__ == '__main__':

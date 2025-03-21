@@ -4,9 +4,7 @@ import os
 class Reader:
     @classmethod
     def read(cls, path):
-        """
-        Determines the file type and calls the appropriate read method.
-        """
+        #Determines the file type and calls the appropriate read method.
         _, ext = os.path.splitext(path)
         if ext.lower() == '.csv':
             return cls.read_csv(path)
