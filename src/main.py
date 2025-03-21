@@ -11,6 +11,11 @@ def create_chart(content):
 
     # Calling lexer and parser, in our case ANTLR, which return AST
     # Calling interperter on AST
+
+    # Need to look smth like these:
+    # ast = Antlr.get_ast(conetnt)
+    # Interpreter.interpret(ast)
+
     # Saving the image (in img directory) and returing the path to it
     # (last comment is a temporar solution)
     pass

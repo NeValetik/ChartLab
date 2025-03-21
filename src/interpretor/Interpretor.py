@@ -1,3 +1,4 @@
 class Interpretor:
-    def __init__(self, **args):
+    @classmethod
+    def interpret(ast):
         pass
