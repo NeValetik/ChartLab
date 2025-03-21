@@ -22,7 +22,7 @@ def create_chart(content):
 
 
 if __name__ == '__main__':
-    with open("data/templates/example1.txt", "r", encoding="utf-8") as file:
+    with open("data/templates/example1.ch" "r", encoding="utf-8") as file:
         content = file.read()
     
     image_path = create_chart(content)
