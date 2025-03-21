@@ -7,7 +7,7 @@ from interpretor.Interpretor import *
 from antlr4 import *
 from antlr.ChartLexer import ChartLexer
 from antlr.ChartParser import ChartParser
-from antlr.visualize import *
+from antlr.visualize import print_tokens, print_parse_tree
 
 from PIL import Image  # To open the image
 
