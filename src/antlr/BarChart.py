@@ -47,7 +47,6 @@ def plot_comparison(df, value_col, category_col):
 
 
 class ParseTreeData(ParseTreeVisitor):
-
     def extract_data(self, tree):
         dataset = None
         x_col = None
