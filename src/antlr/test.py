@@ -16,7 +16,7 @@ def tokenize_and_parse(input_text):
 
     # Create parser
     parser = ChartParser(token_stream)
-    tree = parser.command()  # Change to your top-level rule if needed
+    tree = parser.command()
 
     # Print parse tree
     print("\n\033[1;32mParse Tree:\033[0m")
@@ -24,5 +24,10 @@ def tokenize_and_parse(input_text):
 
 
 if __name__ == "__main__":
-    test_input = "with sales from orders chart:\n   compare revenue for regions"
-    tokenize_and_parse(test_input)
+    # Bar Chart example
+    test_input1 = "with sales from BarChartExamples chart: compare sales for months"
+    tokenize_and_parse(test_input1)
+
+    # Line Chart example
+    test_input2 = "with data from spotify chart: show correlation between ShapeOfYou and Despacito"
+    tokenize_and_parse(test_input2)

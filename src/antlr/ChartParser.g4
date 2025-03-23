@@ -1,13 +1,12 @@
 parser grammar ChartParser;
 
 options {
-    tokenVocab=ChartLexer;  // Use the lexer rules defined above
+    tokenVocab=ChartLexer;  // uses the lexer rules defined above
 }
 
-// Top-level command that starts with 'with' and ends with the chart function
 command            : WITH data FROM table CHART chartFunction ;
 
-// Rules for the chart functions, each representing different types of charts
+// rules for the chart functions
 chartFunction      : COMPARE var FOR cases
                   | DIFFERENCES var FOR cases
                   | CONTRAST var FOR cases
@@ -31,7 +30,6 @@ chartFunction      : COMPARE var FOR cases
                   | PATTERN var AND var
                   | BUBBLE var COMMA var COMMA var FOR cases ;
 
-// Define the data, variables, and continuous variables
 data               : var | continuousVar | var AT var ;
 table              : IDENTIFIER ;
 var                : IDENTIFIER ;
@@ -39,18 +37,14 @@ continuousVar      : IDENTIFIER (COMMA IDENTIFIER)* ;
 
 loop               : WHILE LPAREN condition RPAREN COLON;
 
-// Define ranges for continuous variables
 range              : IDENTIFIER TO IDENTIFIER ;
 
-// Rules for subgroups and cases (both are identifiers)
+
 subgroup           : IDENTIFIER ;
 cases              : IDENTIFIER ;
 
-
-// Trend keyword for log graphs
 trendKeyword       : PROGRESSION_OF | TREND_OF | GROWTH_OF ;
 
-// Define conditions for logical operations
 condition          : NOT? LPAREN? NOT* logicalOperation ((AND | OR) NOT? logicalOperation)* NOT? ;
 logicalOperation  : LPAREN? operationBody RPAREN? logicalOperationSign LPAREN? operationBody RPAREN?;
 operationBody      : LPAREN? operation RPAREN? (operationSign LPAREN? operation RPAREN?)* ;
