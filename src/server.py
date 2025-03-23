@@ -3,22 +3,19 @@ from main import create_chart
 import json
 import os
 
-
 app = Flask(__name__)
 
 @app.route('/api/v1/plot-lab', methods=['POST'])
 def generate_image():
-    json_object = request.data.decode('utf-8')
-    json_data = json.loads(json_object)
-    if "code" not in json_data:
-        return jsonify({"error": "Missing 'code' key in request"}), 400
+    content = json.loads(request.data.decode("utf-8"))
+    print(content)
+    if not content:
+        return "No text provided", 400
 
-    content = json_data["code"]
-
-    img_path = create_chart(content)
+    image_path = create_chart(content["code"])
     if img_path is None:
-        img_path = "data/img/no-image.png"
-    return send_file(img_path, mimetype='image/png')
+            img_path = "data/img/no-image.png"
+    return send_file(image_path, mimetype='image/png')
 
 @app.route('/api/v1/files', methods=['GET'])
 def list_files():
