@@ -1,8 +1,6 @@
 
 ```
-<command> ::= <startProgram> "with" <data> "from" <table> "chart:" <chartFunction> <endProgram>
-<startProgram> ::= "BEGIN"
-<endProgram> ::= "END"
+<command> ::= "with" <data> "from" <table> "chart:" <chartFunction>
 <chartFunction> ::= "compare" <var> "for" <cases> #HERE STARTS BAR CHART
                  | "differences" <var> "for" <cases> 
                  | "contrast" <var> "for" <cases> 
