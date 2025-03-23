@@ -13,8 +13,8 @@ def generate_image():
         return "No text provided", 400
 
     image_path = create_chart(content["code"])
-    if img_path is None:
-            img_path = "data/img/no-image.png"
+    if image_path is None:
+        image_path = "data/img/no-image.png"
     return send_file(image_path, mimetype='image/png')
 
 @app.route('/api/v1/files', methods=['GET'])
