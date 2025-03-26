@@ -11,39 +11,31 @@ def read_csv(file_path):
     return pd.read_csv(file_path)
 
 
-def plot_comparison(df, value_col, category_col):
-    plt.figure(figsize=(12, 7))
+def plot_line_graph(df, x_col, y_col):
+    # Convert the y_col to datetime if it's not already
+    df[y_col] = pd.to_datetime(df[y_col])  # Ensure y_col is datetime
 
-    # Sort and aggregate data
-    grouped_data = df.groupby(category_col)[value_col].sum().sort_values(ascending=False)
+    # Set Seaborn style for better aesthetics
+    sns.set(style="whitegrid")
 
-    # Use a better colormap
-    colors = sns.color_palette("viridis", len(grouped_data))
+    # Create the plot
+    plt.figure(figsize=(12, 6))  # Larger figure size for better clarity
+    plt.plot(df[y_col], df[x_col], linestyle='-', color='b', label=f'{x_col} over time', linewidth=2)
 
-    # Create bar plot
-    bars = plt.bar(grouped_data.index, grouped_data.values, color=colors, alpha=0.85)
+    # Improve plot labels, title, and legend
+    plt.xlabel(f'{y_col}', fontsize=12, labelpad=15)
+    plt.ylabel(f'{x_col}', fontsize=12, labelpad=15)
+    plt.title(f'Line Graph of {x_col} Over {y_col}', fontsize=14, fontweight='bold', pad=20)
+    plt.legend(loc='upper left', fontsize=11)
 
-    # Add labels on bars
-    for bar in bars:
-        plt.text(bar.get_x() + bar.get_width() / 2,
-                 bar.get_height() + max(grouped_data.values) * 0.02,  # Offset for visibility
-                 f"{bar.get_height():,.0f}",
-                 ha='center', fontsize=11, fontweight='bold', color='black')
+    # Rotate x-tick labels for better readability
+    plt.xticks(rotation=45, ha='right')
 
-    # Improve aesthetics
-    plt.xlabel(category_col, fontsize=12, fontweight='bold')
-    plt.ylabel(value_col, fontsize=12, fontweight='bold')
-    plt.title(f"Comparison of {value_col} across {category_col}", fontsize=14, fontweight='bold', pad=15)
-    plt.xticks(rotation=45, ha="right", fontsize=11)
-
-    # Light grid
-    plt.grid(axis="y", linestyle="--", alpha=0.5)
-
-    # Remove top and right spines for a cleaner look
-    sns.despine()
-
-    # Show plot
+    # Set gridlines and customize them
+    plt.grid(True, linestyle='--', alpha=0.6)
     plt.show()
+
+
 
 
 class ParseTreeData(ParseTreeVisitor):
@@ -55,6 +47,7 @@ class ParseTreeData(ParseTreeVisitor):
 
         for child in tree.getChildren():
             if isinstance(child, ChartParser.ChartFunctionContext):
+                print(child.getText())
                 for grandchild in child.getChildren():
                     if isinstance(grandchild, TerminalNode):
                         command = grandchild.getText()
@@ -65,12 +58,18 @@ class ParseTreeData(ParseTreeVisitor):
                     dataset = grandchild.getText()
 
             elif isinstance(child, ChartParser.ChartFunctionContext):
-                for grandchild in child.getChildren():
-                    if isinstance(grandchild, ChartParser.CasesContext):
-                        x_col = grandchild.getText()
-                    elif isinstance(grandchild, ChartParser.VarContext):
-                        y_col = grandchild.getText()
+                grandchild_list = list(child.getChildren())
+                for i in range(len(grandchild_list)):
+                    if isinstance(grandchild_list[i], ChartParser.ContinuousVarContext):
+                        if x_col is None:
+                            x_col = grandchild_list[i].getText()  # First variable
+                        elif y_col is None:
+                            y_col = grandchild_list[i].getText()  # Second variable
+                            break
 
+        print(f"Dataset: {dataset}")
+        print(f"X: {x_col}")
+        print(f"Y: {y_col}")
         return command, dataset, x_col, y_col
 
 
@@ -79,8 +78,8 @@ def interpret_command(parse_tree):
     data = ParseTreeData()
     command, dataset, x_col, y_col = data.extract_data(parse_tree)
 
-    if command != "compare":
-        print("Not compare")
+    if command not in ["compare", "show correlation between"]:
+        print(f"Command '{command}' is not supported for line graphs.")
         return
 
     # Ensure all necessary values are extracted
@@ -101,7 +100,7 @@ def interpret_command(parse_tree):
         return
 
     # Plot the chart
-    plot_comparison(df, y_col, x_col)
+    plot_line_graph(df, x_col, y_col)
 
 
 def parseTree(input_text):
@@ -119,6 +118,6 @@ def parseTree(input_text):
 
 
 if __name__ == "__main__":
-    test_input = "with sales from orders chart:\n   show revenue for regions"
+    test_input = "with data from spotify chart: show correlation between Despacito and Date"
     parse_tree = parseTree(test_input)
     interpret_command(parse_tree)
