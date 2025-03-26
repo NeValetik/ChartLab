@@ -12,12 +12,16 @@ def print_tokens(tokens):
     print("=" * 40)
 
 
-def print_parse_tree(tree, parser, level=0):
-    """ Print parse tree with indentation for readability """
-    indent = "  " * level
+def print_parse_tree(tree, parser, prefix="", is_last=True):
+    """ Print parse tree in a structured tree-like format """
+    branch = "└── " if is_last else "├── "
+    next_prefix = prefix + ("    " if is_last else "│   ")
+
     if isinstance(tree, TerminalNode):
-        print(f"{indent}🟢 {tree.getText()}")
+        print(f"{prefix}{branch}🟢 {tree.getText()}")
     else:
-        print(f"{indent}🔷 {parser.ruleNames[tree.getRuleIndex()]}")
-        for child in tree.children:
-            print_parse_tree(child, parser, level + 1)
+        print(f"{prefix}{branch}🔷 {parser.ruleNames[tree.getRuleIndex()]}")
+
+        if tree.children:
+            for i, child in enumerate(tree.children):
+                print_parse_tree(child, parser, next_prefix, i == len(tree.children) - 1)
