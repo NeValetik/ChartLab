@@ -1,8 +1,10 @@
+import matplotlib
+# Error handling: Matplotlib GUI require main thread, while Flask may run in multi-threading mode.
+# Therefore we use non-GUI backend like 'Agg' for background rendering.
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
-import hashlib
-import random
 import os
 
 def plot_comparison(df, value_col, category_col):
@@ -36,16 +38,11 @@ def plot_comparison(df, value_col, category_col):
     # Remove top and right spines for a cleaner look
     sns.despine()
 
-    # Ensure the output directory exists
-    output_dir = "../data/img"
+    # Saving plot
+    output_dir = "data/img"
     os.makedirs(output_dir, exist_ok=True)
-
-    # Generate a short random hash
-    # In order to avoid overriding images on the same input
-    random_hash = hashlib.md5(str(random.random()).encode()).hexdigest()[:8]
-    filename = f"{value_col}_vs_{category_col}_{random_hash}.png"
+    filename = f"{value_col}_vs_{category_col}.png"
     filepath = os.path.join(output_dir, filename)
-
     plt.savefig(filepath, bbox_inches="tight", dpi=300)
     plt.close()
 
@@ -57,7 +54,7 @@ def plot_line_graph(df, x_col, y_col):
     df[y_col] = pd.to_datetime(df[y_col])  # Ensure y_col is datetime
 
     # Set Seaborn style for better aesthetics
-    sns.set(style="whitegrid")
+    sns.set_theme(style="whitegrid")
 
     # Create the plot
     plt.figure(figsize=(12, 6))  # Larger figure size for better clarity
@@ -75,16 +72,11 @@ def plot_line_graph(df, x_col, y_col):
     # Set gridlines and customize them
     plt.grid(True, linestyle='--', alpha=0.6)
 
-    # Ensure the output directory exists
-    output_dir = "../data/img"
+    # Saving plot
+    output_dir = "data/img"
     os.makedirs(output_dir, exist_ok=True)
-
-    # Generate a short random hash
-    # In order to avoid overriding images on the same input
-    random_hash = hashlib.md5(str(random.random()).encode()).hexdigest()[:8]
-    filename = f"{x_col}_vs_{y_col}_{random_hash}.png"
+    filename = f"{x_col}_and_{y_col}.png"
     filepath = os.path.join(output_dir, filename)
-
     plt.savefig(filepath, bbox_inches="tight", dpi=300)
     plt.close()
 
