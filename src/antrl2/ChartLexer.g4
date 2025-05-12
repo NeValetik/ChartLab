@@ -22,7 +22,7 @@ WITHIN             : 'within' ;
 SHOW_PROPORTION    : 'show proportion of' ;
 SHOW_SHARE         : 'show share of' ;
 SHOW_PERCENTAGE    : 'show percentage of' ;
-SHOW_FREQUENCY    : 'show frequency of' ;
+SHOW_FREQUENCY     : 'show frequency of' ;
 SHOW_DISTRIBUTION  : 'show distribution of' ;
 SHOW_FREQUENCY_BUCKETS : 'show frequency in' ;
 ACCUMULATION       : 'accumulation of' ;
@@ -37,29 +37,33 @@ AND                : 'and' ;
 OR                 : 'or' ;
 AT                 : 'at' ;
 TO                 : 'to' ;
-FOR                : 'for';
+FOR                : 'for' ;
 
-COMMA              : ',' ;
-COLON              : ':' ;
-LPAREN             : '(' ;
-RPAREN             : ')' ;
-WHILE              : 'while' ;
+// Operators and symbols
+NOT     : '!' ;
+PLUS    : '+' ;
+MINUS   : '-' ;
+MULTIPLY: '*' ;
+DIVIDE  : '/' ;
+LT      : '<' ;
+LTE     : '<=' ;
+GT      : '>' ;
+GTE     : '>=' ;
+EQ      : '==' ;
+NEQ     : '!=' ;
 
-NOT: '!';
-PLUS: '+';
-MINUS: '-';
-MULTIPLY: '*';
-DIVIDE: '/';
-LT: '<';
-LTE: '<=';
-GT: '>';
-GTE: '>=';
-EQ: '==';
-NEQ: '!=';
+COMMA   : ',' ;
+COLON   : ':' ;
+LPAREN  : '(' ;
+RPAREN  : ')' ;
+LBRACE  : '{' ;
+RBRACE  : '}' ;
+WHILE   : 'while' ;
 
 IDENTIFIER : LETTER (LETTER | DIGIT)* ;
 
 fragment LETTER : [a-zA-Z] ;
 fragment DIGIT  : [0-9] ;
 
-WS                 : [ \t\r\n]+ -> skip ; // Whitespace (skip it)
+// Whitespace
+WS : [ \t\n\r]+ -> skip ;
