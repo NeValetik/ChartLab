@@ -18,7 +18,9 @@ def generate_image():
 @app.route('/api/v1/files', methods=['GET'])
 def list_files():
     files_content = []
+    script_dir = os.path.dirname(os.path.abspath(__file__))
     repo_path = "data/templates"
+    repo_path = os.path.join(script_dir, repo_path)
     for filename in os.listdir(repo_path):
         file_path = os.path.join(repo_path, filename)
         if os.path.isfile(file_path):
