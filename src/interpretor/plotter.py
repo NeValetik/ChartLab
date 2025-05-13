@@ -39,13 +39,10 @@ def plot_comparison(df, value_col, category_col):
     sns.despine()
 
     # Saving plot
-    output_dir = "data/img"
-    os.makedirs(output_dir, exist_ok=True)
     filename = f"{value_col}_vs_{category_col}.png"
-    filepath = os.path.join(output_dir, filename)
+    filepath = get_img_output_path(filename)
     plt.savefig(filepath, bbox_inches="tight", dpi=300)
     plt.close()
-
     return filepath
 
 
@@ -73,11 +70,22 @@ def plot_line_graph(df, x_col, y_col):
     plt.grid(True, linestyle='--', alpha=0.6)
 
     # Saving plot
-    output_dir = "data/img"
-    os.makedirs(output_dir, exist_ok=True)
     filename = f"{x_col}_and_{y_col}.png"
-    filepath = os.path.join(output_dir, filename)
+    filepath = get_img_output_path(filename)
     plt.savefig(filepath, bbox_inches="tight", dpi=300)
     plt.close()
-
     return filepath
+
+def get_img_output_path(filename: str) -> str:
+    # Get the directory of the current script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # Navigate to /src
+    src_dir = os.path.abspath(os.path.join(script_dir, ".."))
+
+    # Construct the /src/data/img path
+    output_dir = os.path.join(src_dir, "data", "img")
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Return the full path to the image file
+    return os.path.join(output_dir, filename)
