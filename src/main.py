@@ -5,9 +5,8 @@ from interpretor.interpretor import *
 
 # ANTLR components
 from antlr4 import *
-from antlr.ChartLexer import ChartLexer
-from antlr.ChartParser import ChartParser
-from antlr.visualize import print_tokens, print_parse_tree
+from antlr2.ChartLexer import ChartLexer
+from antlr2.ChartParser import ChartParser
 
 from PIL import Image
 
