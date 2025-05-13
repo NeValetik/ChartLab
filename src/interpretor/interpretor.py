@@ -3,9 +3,9 @@ from interpretor import plotter
 import sys, os
 
 from antlr4 import *
-# To import outer packages
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 from antlr.ChartParser import ChartParser
+from antlr.ChartLexer import ChartLexer
 
 class Interpretor(ParseTreeVisitor):
     img_path = None
@@ -14,94 +14,88 @@ class Interpretor(ParseTreeVisitor):
         if tree is None:
             return
         
-        # Interpret the node
         self.interpret_node(tree)
         if Interpretor.img_path is not None:
-            # Because it is class field, it is not reseted
             img_path = Interpretor.img_path
             Interpretor.img_path = None
             return img_path
 
-        # Recursively walk through children
-        # For now this solution will not scale to more/another code, but for now it will plot our chart
         for i in range(tree.getChildCount()):
             self.walk_tree(tree.getChild(i))
         
-        # This condition will be reached only if after entire program, there was not a single plotting action
         return
 
     def interpret_node(self, node):
-
         if isinstance(node, ChartParser.CommandContext):
-            print(f"Node: {node.getText()}")
             self.interpret_command(node)
-
-        elif isinstance(node, ChartParser.TableContext):
-            pass
         elif isinstance(node, ChartParser.ChartFunctionContext):
-            pass
+            pass  # Handled within interpret_command
 
     def interpret_command(self, node):
-        command = None
         dataset = None
-        x_col = None
-        y_col = None
+        chart_func_ctx = None
 
+        # Extract dataset (table) and chart function context
         for child in node.getChildren():
-            if isinstance(child, ChartParser.ChartFunctionContext):
-                print(child.getText())
-                for grandchild in child.getChildren():
-                    if isinstance(grandchild, TerminalNode):
-                        command = grandchild.getText()
-                        print(f"First word of command: {command}")
-                        break
-        if command in ["compare"]:
-            for child in node.getChildren():
-                if isinstance(child, ChartParser.TableContext):
-                    for grandchild in child.getChildren():
-                        dataset = grandchild.getText()
+            if isinstance(child, ChartParser.TableContext):
+                dataset = child.getText()
+            elif isinstance(child, ChartParser.ChartFunctionContext):
+                chart_func_ctx = child
 
-                elif isinstance(child, ChartParser.ChartFunctionContext):
-                    for grandchild in child.getChildren():
-                        if isinstance(grandchild, ChartParser.CasesContext):
-                            x_col = grandchild.getText()
-                        elif isinstance(grandchild, ChartParser.VarContext):
-                            y_col = grandchild.getText()
-        elif command in ["show correlation between"]:
-            for child in node.getChildren():
-                if isinstance(child, ChartParser.TableContext):
-                    for grandchild in child.getChildren():
-                        dataset = grandchild.getText()
-
-                elif isinstance(child, ChartParser.ChartFunctionContext):
-                    grandchild_list = list(child.getChildren())
-                    for i in range(len(grandchild_list)):
-                        if isinstance(grandchild_list[i], ChartParser.ContinuousVarContext):
-                            if x_col is None:
-                                x_col = grandchild_list[i].getText()  # First variable
-                            elif y_col is None:
-                                y_col = grandchild_list[i].getText()  # Second variable
-                                break
-
-        # Ensure all necessary values are extracted
-        if dataset is None or x_col is None or y_col is None:
-            print("Error: Could not extract dataset, x_col, or y_col from the command.")
-            print(f"Parsed values: dataset={dataset}, x_col={x_col}, y_col={y_col}")  # Debug
+        if not dataset or not chart_func_ctx:
+            print("Error: Incomplete command - missing dataset or chart function.")
             return
 
+        # Determine the type of chart function
+        command_type = None
+        for child in chart_func_ctx.getChildren():
+            if isinstance(child, TerminalNode):
+                token_type = child.getSymbol().type
+                if token_type == ChartLexer.COMPARE:
+                    command_type = 'COMPARE'
+                elif token_type == ChartLexer.CORRELATION:
+                    command_type = 'CORRELATION'
+                # Add other command types here as needed
+                break  # Assume first terminal defines the command
+
+        x_col, y_col = None, None
+
+        # Extract parameters based on command type
+        if command_type == 'COMPARE':
+            var, cases = None, None
+            for child in chart_func_ctx.getChildren():
+                if isinstance(child, ChartParser.VarContext):
+                    var = child.getText()
+                elif isinstance(child, ChartParser.CasesContext):
+                    cases = child.getText()
+            x_col, y_col = cases, var
+
+        elif command_type == 'CORRELATION':
+            continuous_vars = []
+            for child in chart_func_ctx.getChildren():
+                if isinstance(child, ChartParser.ContinuousVarContext):
+                    continuous_vars.append(child.getText())
+            if len(continuous_vars) >= 2:
+                x_col, y_col = continuous_vars[0], continuous_vars[1]
+
+        # Handle other command types here...
+
+        # Validate extracted parameters
+        if not x_col or not y_col:
+            print(f"Error: Missing parameters for {command_type} command.")
+            return
+
+        # Read dataset and validate columns
         df = Reader.read(f"{dataset}.csv")
-
-        # Check if required columns exist
         if x_col not in df.columns or y_col not in df.columns:
-            print(f"Error: Columns '{x_col}' or '{y_col}' not found in the dataset {dataset}.")
+            print(f"Error: Columns '{x_col}' or '{y_col}' not found in dataset '{dataset}'.")
             return
 
-        if command in ["compare"]:
+        # Invoke appropriate plotter function
+        if command_type == 'COMPARE':
             Interpretor.img_path = plotter.plot_comparison(df, y_col, x_col)
-        elif command in ["show correlation between"]:
+        elif command_type == 'CORRELATION':
             Interpretor.img_path = plotter.plot_line_graph(df, x_col, y_col)
+        # Add other plotting calls as needed
 
-
-
-
-
+        return

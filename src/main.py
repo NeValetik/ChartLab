@@ -1,12 +1,7 @@
-# Custom components (even if we are not using lexer and parser)
-from lexer.lexer import *
-from parser.parser import *
-from interpretor.interpretor import *
-
-# ANTLR components
 from antlr4 import *
 from antlr2.ChartLexer import ChartLexer
 from antlr2.ChartParser import ChartParser
+from interpretor.interpretor import *
 
 from PIL import Image
 

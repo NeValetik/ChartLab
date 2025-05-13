@@ -1,3 +1,4 @@
-black
-pylint
-Flask
+flask
+seaborn
+matplotlib
+graphviz
