@@ -102,10 +102,9 @@ def plot_line_graph(df, x_col, y_col):
         )
     )
 
-    # Save as HTML
     filename = f"{x_col}_and_{y_col}.html"
     filepath = get_img_output_path(filename)
-    fig.write_html(filepath, include_plotlyjs="cdn")
+    fig.write_json(filepath, include_plotlyjs="cdn")
     return filepath
 
 def get_img_output_path(filename: str) -> str:
