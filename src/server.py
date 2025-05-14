@@ -10,10 +10,16 @@ def generate_image():
     if not content:
         return jsonify("No text provided", 400)
 
-    image_path = create_chart(content["code"])
-    if image_path is None:
-        image_path = "data/img/no-image.png"
-    return send_file(image_path, mimetype='image/png')
+    html_path = create_chart(content["code"])
+    if html_path is None:
+        html_path = "data/img/no-image.png"
+        
+    return send_file(
+        html_path,
+        mimetype='text/html',
+        as_attachment=False,
+        attachment_filename=os.path.basename(html_path)
+    )
 
 @app.route('/api/v1/files', methods=['GET'])
 def list_files():
