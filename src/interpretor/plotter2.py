@@ -49,10 +49,9 @@ def plot_comparison(df, value_col, category_col):
         margin=dict(t=60, b=100)
     )
 
-    # Save as HTML
     filename = f"{value_col}_vs_{category_col}.html"
     filepath = get_img_output_path(filename)
-    fig.write_html(filepath, include_plotlyjs="cdn")
+    fig.write_json(filepath, include_plotlyjs="cdn")
     return filepath
 
 def plot_line_graph(df, x_col, y_col):
