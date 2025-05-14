@@ -7,9 +7,67 @@ import plotly.express as px
 def plot_comparison(df, value_col, category_col):
     # Sort and aggregate data
     grouped_data = df.groupby(category_col)[value_col].sum().sort_values(ascending=False).reset_index()
+
+    # Generate colors using seaborn's viridis palette
+    colors = sns.color_palette("viridis", len(grouped_data))
+    hex_colors = [matplotlib.colors.rgb2hex(color) for color in colors]
+
+    # Create interactive bar plot
+    fig = px.bar(
+        grouped_data,
+        x=category_col,
+        y=value_col,
+        color=category_col,
+        color_discrete_sequence=hex_colors
+    )
+
+    # Customize the plot
+    fig.update_traces(
+        texttemplate='%{y:,.0f}',
+        textposition='outside',
+        marker=dict(opacity=0.85)
+    )
+
+    fig.update_layout(
+        title=dict(
+            text=f"Comparison of {value_col} across {category_col}",
+            font=dict(size=16, family="Arial", color="black")
+        ),
+        xaxis=dict(
+            title=dict(text=category_col, font=dict(size=14, family="Arial")),
+            tickangle=-45,
+            tickfont=dict(size=12)
+        ),
+        yaxis=dict(
+            title=dict(text=value_col, font=dict(size=14, family="Arial")),
+            gridcolor="lightgray",
+            gridwidth=0.5,
+            showgrid=True
+        ),
+        plot_bgcolor="white",
+        showlegend=False,
+        margin=dict(t=60, b=100)
+    )
+
+    filename = f"{value_col}_vs_{category_col}.json"
+    filepath = get_img_output_path(filename)
+    
+    # Write to JSON with proper formatting
+    fig.write_json(
+        filepath,
+        pretty=True,  # For human-readable formatting
+        remove_uids=True  # Cleaner output
+    )
+    
+    return filepath
+
+def plot_comaprison_daniela_version(df, value_col, category_col):
+    # Sort and aggregate data
+    grouped_data = df.groupby(category_col)[value_col].sum().sort_values(ascending=False).reset_index()
     
     # Create dynamic color scale with smooth transitions
-    color_scale = px.colors.cyclical.Twilight
+    # color_scale = px.colors.cyclical.Twilight
+    color_scale = ['#1C0B85', '#8D2C8C', '#C7636B', '#EBAD51', '#F1F45B']
     max_value = grouped_data[value_col].max()
     
     # Create interactive bar plot with advanced styling

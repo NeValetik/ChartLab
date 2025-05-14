@@ -93,7 +93,7 @@ class Interpretor(ParseTreeVisitor):
 
         # Invoke appropriate plotter function
         if command_type == 'COMPARE':
-            Interpretor.img_path = plotter2.plot_comparison(df, y_col, x_col)
+            Interpretor.img_path = plotter2.plot_comaprison_daniela_version(df, y_col, x_col)
         elif command_type == 'CORRELATION':
             Interpretor.img_path = plotter2.plot_line_graph(df, x_col, y_col)
         # Add other plotting calls as needed
