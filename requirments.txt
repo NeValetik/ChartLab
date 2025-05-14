@@ -2,3 +2,4 @@ flask
 seaborn
 matplotlib
 graphviz
+plotly
