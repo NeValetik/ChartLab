@@ -90,8 +90,12 @@ class Interpretor(ParseTreeVisitor):
             print(f"Error: Missing parameters for {command_type} command.")
             return
 
+
         # Read dataset and validate columns
         df = Reader.read(f"{dataset}.csv")
+
+        df.columns = df.columns.str.strip().str.lower()
+
         if x_col not in df.columns or y_col not in df.columns or (group_col and group_col not in df.columns):
             print(f"Error: One or more columns not found not found in dataset '{dataset}'.")
             return
