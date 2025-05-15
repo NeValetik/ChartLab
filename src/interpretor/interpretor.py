@@ -1,3 +1,4 @@
+import pandas as pd
 from reader.reader import *
 from interpretor import plotter2
 import sys, os
@@ -48,6 +49,9 @@ class Interpretor(ParseTreeVisitor):
             print("Error: Incomplete command - missing dataset or chart function.")
             return
 
+        # Read dataset and validate columns
+        df = Reader.read(f"{dataset}.csv")
+
         # Determine the type of chart function
         command_type = None
         for child in chart_func_ctx.getChildren():
@@ -57,6 +61,8 @@ class Interpretor(ParseTreeVisitor):
                     command_type = 'COMPARE'
                 elif token_type == ChartLexer.CORRELATION:
                     command_type = 'CORRELATION'
+                elif token_type == ChartLexer.DIFFERENCES:
+                    command_type = 'DIFFERENCES'
                 # Add other command types here as needed
                 break  # Assume first terminal defines the command
 
@@ -83,16 +89,28 @@ class Interpretor(ParseTreeVisitor):
             if len(continuous_vars) >= 2:
                 x_col, y_col = continuous_vars[0], continuous_vars[1]
 
+        elif command_type == 'DIFFERENCES':
+            #sa presupunem ca acest tip de comanda pt BAR CHART GROUPED/SPLIT merge doar cand tabelul are 3 coloane
+            #daca tabelul are mai multe, va aleg pe prima numerica. pe viitor rezolvam.
+            var, cases = None, None
+            for child in chart_func_ctx.getChildren():
+                if isinstance(child, ChartParser.CasesContext):
+                    cases = child.getText()
+                elif isinstance(child, ChartParser.SubgroupContext):
+                    group_col = child.getText()
+
+            x_col = cases
+            if var is None:
+                excluded = {group_col.lower(), x_col.lower()}
+                possible_value_cols = [col for col in df.columns if
+                                       col not in excluded and pd.api.types.is_numeric_dtype(df[col])]
+                if not possible_value_cols:
+                    print("Error: Could not determine a suitable numeric column for plotting.")
+                    return
+                var = possible_value_cols[0]
+            y_col = var.lower()
+
         # Handle other command types here...
-
-        # Validate extracted parameters
-        if not x_col or not y_col:
-            print(f"Error: Missing parameters for {command_type} command.")
-            return
-
-
-        # Read dataset and validate columns
-        df = Reader.read(f"{dataset}.csv")
 
         df.columns = df.columns.str.strip().str.lower()
 
@@ -101,7 +119,7 @@ class Interpretor(ParseTreeVisitor):
             return
 
         # Invoke appropriate plotter function
-        if command_type == 'COMPARE':
+        if command_type == 'COMPARE' or command_type == 'DIFFERENCES':
             if group_col:
                 Interpretor.img_path = plotter2.plot_grouped_bar_chart(df, y_col, x_col, group_col)
             else:
