@@ -4,8 +4,8 @@ import sys, os
 
 from antlr4 import *
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
-from antlr1.ChartParser import ChartParser
-from antlr1.ChartLexer import ChartLexer
+from antlr2.ChartParser import ChartParser
+from antlr2.ChartLexer import ChartLexer
 
 class Interpretor(ParseTreeVisitor):
     img_path = None
