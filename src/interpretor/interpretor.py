@@ -3,9 +3,11 @@ from interpretor import plotter2
 import sys, os
 
 from antlr4 import *
+
+from src.antlr2.ChartLexer import ChartLexer
+from src.antlr2.ChartParser import ChartParser
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
-from antlr2.ChartParser import ChartParser
-from antlr2.ChartLexer import ChartLexer
 
 class Interpretor(ParseTreeVisitor):
     img_path = None
@@ -59,6 +61,7 @@ class Interpretor(ParseTreeVisitor):
                 break  # Assume first terminal defines the command
 
         x_col, y_col = None, None
+        group_col = None
 
         # Extract parameters based on command type
         if command_type == 'COMPARE':
@@ -68,6 +71,8 @@ class Interpretor(ParseTreeVisitor):
                     var = child.getText()
                 elif isinstance(child, ChartParser.CasesContext):
                     cases = child.getText()
+                elif isinstance(child, ChartParser.SubgroupContext):
+                    group_col = child.getText()
             x_col, y_col = cases, var
 
         elif command_type == 'CORRELATION':
@@ -87,13 +92,16 @@ class Interpretor(ParseTreeVisitor):
 
         # Read dataset and validate columns
         df = Reader.read(f"{dataset}.csv")
-        if x_col not in df.columns or y_col not in df.columns:
-            print(f"Error: Columns '{x_col}' or '{y_col}' not found in dataset '{dataset}'.")
+        if x_col not in df.columns or y_col not in df.columns or (group_col and group_col not in df.columns):
+            print(f"Error: One or more columns not found not found in dataset '{dataset}'.")
             return
 
         # Invoke appropriate plotter function
         if command_type == 'COMPARE':
-            Interpretor.img_path = plotter2.plot_comaprison_daniela_version(df, y_col, x_col)
+            if group_col:
+                Interpretor.img_path = plotter2.plot_grouped_bar_chart(df, y_col, x_col, group_col)
+            else:
+                Interpretor.img_path = plotter2.plot_comaprison_daniela_version(df, y_col, x_col)
         elif command_type == 'CORRELATION':
             Interpretor.img_path = plotter2.plot_line_graph(df, x_col, y_col)
         # Add other plotting calls as needed
