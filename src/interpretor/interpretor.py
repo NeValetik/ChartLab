@@ -63,6 +63,8 @@ class Interpretor(ParseTreeVisitor):
                     command_type = 'CORRELATION'
                 elif token_type == ChartLexer.DIFFERENCES:
                     command_type = 'DIFFERENCES'
+                elif token_type == ChartLexer.SHOW:
+                    command_type = 'SHOW'
                 # Add other command types here as needed
                 break  # Assume first terminal defines the command
 
@@ -110,6 +112,19 @@ class Interpretor(ParseTreeVisitor):
                 var = possible_value_cols[0]
             y_col = var.lower()
 
+
+        elif command_type == 'SHOW':
+            ##pt bar chart stacked
+            var, cases = None, None
+            for child in chart_func_ctx.getChildren():
+                if isinstance(child, ChartParser.VarContext):
+                    var = child.getText()
+                elif isinstance(child, ChartParser.CasesContext):
+                    cases = child.getText()
+                elif isinstance(child, ChartParser.SubgroupContext):
+                    group_col = child.getText()
+            x_col, y_col = cases, var
+
         # Handle other command types here...
 
         df.columns = df.columns.str.strip().str.lower()
@@ -126,6 +141,12 @@ class Interpretor(ParseTreeVisitor):
                 Interpretor.img_path = plotter2.plot_comaprison_daniela_version(df, y_col, x_col)
         elif command_type == 'CORRELATION':
             Interpretor.img_path = plotter2.plot_line_graph(df, x_col, y_col)
+        elif command_type == 'SHOW':
+            if group_col:
+                Interpretor.img_path = plotter2.plot_stacked_bar_chart(df, y_col, x_col, group_col)
+            else:
+                pass
+                #other show commands
         # Add other plotting calls as needed
 
         return

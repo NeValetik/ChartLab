@@ -349,6 +349,103 @@ def plot_grouped_bar_chart(df, y_col, x_col, group_col):
 
     return filepath
 
+def plot_stacked_bar_chart(df, y_col, x_col, group_col):
+    # Aggregate the data
+    grouped_data = df.groupby([x_col, group_col])[y_col].sum().reset_index()
+
+    # Determine color palette
+    unique_stacks = grouped_data[group_col].nunique()
+    colors = sns.color_palette("rocket", unique_stacks)
+    hex_colors = [matplotlib.colors.rgb2hex(c) for c in colors]
+
+    # Create the stacked bar chart
+    fig = px.bar(
+        grouped_data,
+        x=x_col,
+        y=y_col,
+        color=group_col,
+        barmode='stack',
+        color_discrete_sequence=hex_colors,
+        text_auto='.2s',
+        hover_data={y_col: ':,.0f'},
+        height=700,
+        template='plotly_white'
+    )
+
+    # Enhance trace aesthetics
+    fig.update_traces(
+        marker=dict(line=dict(width=1.5, color='white')),
+        textfont=dict(size=13),
+        textposition='inside',
+        hovertemplate="<b>%{x}</b><br>%{customdata[0]}: %{y:,.0f}<extra></extra>",
+        customdata=grouped_data[[group_col]]
+    )
+
+    # Configure layout
+    fig.update_layout(
+        title=dict(
+            text=f"<span style='font-size:24px; font-weight:600;'>Stacked {y_col} by {group_col}</span><br>"
+                 f"<span style='font-size:18px; color:#606060'>Grouped by {x_col}</span>",
+            x=0.03,
+            y=0.95,
+            xanchor='left',
+            yanchor='top'
+        ),
+        xaxis=dict(
+            title=None,
+            tickfont=dict(size=13, family='Poppins', color='#606060'),
+            showgrid=False,
+            linecolor='#d0d0d0'
+        ),
+        yaxis=dict(
+            title=None,
+            gridcolor='rgba(200, 200, 200, 0.3)',
+            tickfont=dict(size=12, color='#808080'),
+            zeroline=False
+        ),
+        plot_bgcolor='white',
+        paper_bgcolor='#f8f9fa',
+        margin=dict(t=100, b=100, l=60, r=40),
+        font=dict(family='Poppins, Arial', color='#404040'),
+        legend=dict(
+            title=dict(text=group_col, font=dict(size=13)),
+            orientation='h',
+            yanchor='bottom',
+            y=-0.25,
+            xanchor='center',
+            x=0.5,
+            font=dict(size=12)
+        )
+    )
+
+    # Optional: Add annotations or summary box
+    total_sum = grouped_data[y_col].sum()
+    total_sum = float(total_sum)  # ensure it's a number
+
+    fig.add_annotation(
+        x=1,
+        y=1.02,
+        xref="paper",
+        yref="paper",
+        text=f"<b>Total {y_col}:</b> {total_sum:,.0f}",
+        showarrow=False,
+        font=dict(size=13),
+        align="right",
+        bgcolor="rgba(255,255,255,0.9)",
+        bordercolor="#d0d0d0",
+        borderwidth=1
+    )
+
+    # Save as JSON
+    filename = f"{y_col}_stacked_by_{group_col}_on_{x_col}.json"
+    filepath = get_img_output_path(filename)
+    fig.write_json(
+        filepath,
+        pretty=True,
+        remove_uids=True
+    )
+
+    return filepath
 
 
 def get_img_output_path(filename: str) -> str:
