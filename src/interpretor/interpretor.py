@@ -65,9 +65,10 @@ class Interpretor(ParseTreeVisitor):
                     command_type = 'DIFFERENCES'
                 elif token_type == ChartLexer.SHOW:
                     command_type = 'SHOW'
+                elif token_type == ChartLexer.SCATTER_PLOT or token_type == ChartLexer.PATTERN:
+                    command_type = 'SCATTER'
                 # Add other command types here as needed
                 break  # Assume first terminal defines the command
-
         x_col, y_col = None, None
         group_col = None
 
@@ -125,6 +126,15 @@ class Interpretor(ParseTreeVisitor):
                     group_col = child.getText()
             x_col, y_col = cases, var
 
+        elif command_type == 'SCATTER':
+            var_context = []
+            for child in chart_func_ctx.getChildren():
+                if isinstance(child, ChartParser.VarContext):
+                    var_context.append(child.getText())
+            if len(var_context) >= 2:
+                x_col = var_context[0].lower()
+                y_col = var_context[1].lower()
+
         # Handle other command types here...
 
         df.columns = df.columns.str.strip().str.lower()
@@ -147,6 +157,8 @@ class Interpretor(ParseTreeVisitor):
             else:
                 pass
                 #other show commands
+        elif command_type == 'SCATTER':
+            Interpretor.img_path = plotter2.plot_scatter_plot(df, x_col, y_col)
         # Add other plotting calls as needed
 
         return

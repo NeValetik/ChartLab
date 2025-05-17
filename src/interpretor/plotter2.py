@@ -447,6 +447,101 @@ def plot_stacked_bar_chart(df, y_col, x_col, group_col):
 
     return filepath
 
+def plot_scatter_plot(
+    df,
+    x_col,
+    y_col,
+    point_color="blue",
+    point_size=8,
+    marker_symbol="circle",
+    label_col=None
+):
+    """
+    Generates an interactive scatter plot and exports it as a JSON file.
+
+    Parameters:
+        df (pd.DataFrame): Data source.
+        x_col (str): Column name for x-axis.
+        y_col (str): Column name for y-axis.
+        point_color (str): Marker color.
+        point_size (int): Size of points.
+        marker_symbol (str): Marker shape (e.g., 'circle', 'diamond').
+        label_col (str or None): Optional column for text labels on hover.
+
+    Returns:
+        str: Path to the saved JSON file.
+    """
+    if x_col not in df.columns or y_col not in df.columns:
+        raise ValueError(f"Columns '{x_col}' or '{y_col}' not found in DataFrame.")
+
+    if pd.api.types.is_string_dtype(df[x_col]) or pd.api.types.is_object_dtype(df[x_col]):
+        try:
+            df[x_col] = pd.to_datetime(df[x_col])
+        except Exception:
+            pass
+
+    # Define hover template
+    hover = f"<b>{x_col}</b>: %{{x}}<br><b>{y_col}</b>: %{{y}}"
+    if label_col and label_col in df.columns:
+        hover += f"<br><b>Label</b>: %{{customdata[0]}}"
+
+    fig = px.scatter(
+        df,
+        x=x_col,
+        y=y_col,
+        title=f"Scatter plot showing the relation between {y_col} vs {x_col}",
+        custom_data=[df[label_col]] if label_col else None
+    )
+
+    fig.update_traces(
+        marker=dict(
+            size=point_size,
+            color=point_color,
+            symbol=marker_symbol,
+            line=dict(width=1, color='DarkSlateGrey')
+        ),
+        mode="markers",
+        hovertemplate=hover + "<extra></extra>"
+    )
+
+    fig.update_layout(
+        title=dict(
+            text=f"<b>Scatter plot showing the relation between {x_col.capitalize()} vs {y_col.capitalize()}</b>",
+            font=dict(size=18, family="Arial", color="black"),
+            x=0.5,
+            xanchor='center'
+        ),
+        xaxis=dict(
+            title=dict(text=f"<b>{x_col.capitalize()}</b>", font=dict(size=14, family="Arial")),
+            tickangle=-45,
+            showgrid=True,
+            gridcolor="rgba(211, 211, 211, 0.5)",
+            zeroline=False
+        ),
+        yaxis=dict(
+            title=dict(text=f"<b>{y_col.capitalize()}</b>", font=dict(size=14, family="Arial")),
+            showgrid=True,
+            gridcolor="rgba(211, 211, 211, 0.5)",
+            zeroline=False
+        ),
+        plot_bgcolor="white",
+        hovermode="closest",
+        margin=dict(t=70, b=100, l=60, r=30),
+        legend=dict(
+            title_text="",
+            bgcolor="rgba(255, 255, 255, 0.8)",
+            bordercolor="LightGrey",
+            borderwidth=1
+        )
+    )
+
+    filename = f"{y_col}_vs_{x_col}.json"
+    filepath = get_img_output_path(filename)
+
+    fig.write_json(filepath, pretty=True, remove_uids=True)
+
+    return filepath
+
 
 def get_img_output_path(filename: str) -> str:
     script_dir = os.path.dirname(os.path.abspath(__file__))
