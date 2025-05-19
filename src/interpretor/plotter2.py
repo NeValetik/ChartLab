@@ -542,6 +542,104 @@ def plot_scatter_plot(
 
     return filepath
 
+def plot_pie_chart(df, x_col, y_col):
+    # Convert y_col to numeric if it's not already
+    if not pd.api.types.is_numeric_dtype(df[y_col]):
+        # Clean and convert numeric values
+        df[y_col] = (
+            df[y_col]
+            .astype(str)
+            .str.replace(r"[^\d.]", "", regex=True)  # Remove non-numeric chars
+            .pipe(pd.to_numeric, errors="coerce")
+        )
+        
+        # Remove invalid rows
+        df = df.dropna(subset=[y_col])
+        if df.empty:
+            raise ValueError(f"Column '{y_col}' contains no valid numeric data")
+
+    # Convert x_col to string if it's numeric
+    if pd.api.types.is_numeric_dtype(df[x_col]):
+        df[x_col] = df[x_col].astype(str).str.replace(r"\.0$", "", regex=True)
+        
+    # Aggregate data
+    grouped_data = df.groupby(x_col)[y_col].sum().sort_values(ascending=False).reset_index()
+
+    # Generate professional color palette
+    colors = sns.color_palette("viridis", len(grouped_data))
+    hex_colors = [matplotlib.colors.rgb2hex(color) for color in colors]
+
+    # Create interactive pie chart
+    fig = px.pie(
+        grouped_data,
+        names=x_col,
+        values=y_col,
+        color_discrete_sequence=hex_colors,
+        hole=0.3,  # Creates a donut-style chart
+        hover_data={y_col: ':,.0f'}
+    )
+
+    # Customize traces
+    fig.update_traces(
+        texttemplate='<b>%{label}</b><br>%{value:,.0f} (%{percent})',
+        textposition='auto',
+        insidetextorientation='radial',
+        marker=dict(
+            line=dict(color='white', width=1.5),
+        ),
+        hovertemplate=(
+            "<b>%{label}</b><br>"
+            f"{y_col}: <b>%{{customdata[0]:,.0f}}</b><br>"
+            "Percentage: %{percent}<extra></extra>"
+        ),
+        pull=[0.05 if i == 0 else 0 for i in range(len(grouped_data))]  # Emphasize largest slice
+    )
+
+    total_value = float(grouped_data[y_col].sum())  # Ensure numeric type
+    total_str = f"{total_value:,.2f}".rstrip('0').rstrip('.')  # Clean format
+
+    # Professional layout configuration
+    fig.update_layout(
+        title=dict(
+            text=f"<span style='font-size:24px; font-weight:600;'>{y_col} Distribution</span><br>"
+                 f"<span style='font-size:18px; color:#606060'>by {x_col}</span>",
+            x=0.03,
+            y=0.95,
+            xanchor='left',
+            yanchor='top'
+        ),
+        annotations=[
+            dict(
+                text=f"Total {y_col}:<br>{total_str}",
+                x=0.5,
+                y=0.5,
+                font_size=16,
+                showarrow=False,
+                font=dict(color='#606060')
+            )
+        ],
+        plot_bgcolor='white',
+        paper_bgcolor='#f8f9fa',
+        margin=dict(t=100, b=60, l=60, r=160),
+        font=dict(family='Poppins, Arial', color='#404040'),
+        legend=dict(
+            title=dict(text=f"{x_col}:", font=dict(size=13)),
+            orientation='v',
+            yanchor='middle',
+            xanchor='right',
+            x=1.2,
+            itemclick=False,
+            itemdoubleclick=False
+        ),
+    )
+
+    # Save visualization
+    filename = f"pie_{y_col}_by_{x_col}.json"
+    filepath = get_img_output_path(filename)
+
+    fig.write_json(filepath, pretty=True, remove_uids=True)
+
+    return filepath
 
 def get_img_output_path(filename: str) -> str:
     script_dir = os.path.dirname(os.path.abspath(__file__))

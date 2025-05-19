@@ -5,8 +5,8 @@ import sys, os
 
 from antlr4 import *
 
-from src.antlr2.ChartLexer import ChartLexer
-from src.antlr2.ChartParser import ChartParser
+from antlr2.ChartLexer import ChartLexer
+from antlr2.ChartParser import ChartParser
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
@@ -67,6 +67,8 @@ class Interpretor(ParseTreeVisitor):
                     command_type = 'SHOW'
                 elif token_type == ChartLexer.SCATTER_PLOT or token_type == ChartLexer.PATTERN:
                     command_type = 'SCATTER'
+                elif token_type == ChartLexer.SHOW_PROPORTION or token_type == ChartLexer.SHOW_SHARE or token_type == ChartLexer.SHOW_PERCENTAGE:
+                    command_type = 'PROPORTION'
                 # Add other command types here as needed
                 break  # Assume first terminal defines the command
         x_col, y_col = None, None
@@ -134,13 +136,20 @@ class Interpretor(ParseTreeVisitor):
             if len(var_context) >= 2:
                 x_col = var_context[0].lower()
                 y_col = var_context[1].lower()
+        
+        elif command_type == 'PROPORTION':  # Pie chart
+            for child in chart_func_ctx.getChildren():
+                if isinstance(child, ChartParser.VarContext):
+                    y_col = child.getText()
+                elif isinstance(child, ChartParser.CasesContext):
+                    x_col = child.getText()
 
         # Handle other command types here...
 
         df.columns = df.columns.str.strip().str.lower()
 
         if x_col not in df.columns or y_col not in df.columns or (group_col and group_col not in df.columns):
-            print(f"Error: One or more columns not found not found in dataset '{dataset}'.")
+            print(f"Error: One or more columns ({x_col, y_col}) not found not found in dataset '{dataset}'.")
             return
 
         # Invoke appropriate plotter function
@@ -159,6 +168,8 @@ class Interpretor(ParseTreeVisitor):
                 #other show commands
         elif command_type == 'SCATTER':
             Interpretor.img_path = plotter2.plot_scatter_plot(df, x_col, y_col)
+        elif command_type == 'PROPORTION':
+            Interpretor.img_path = plotter2.plot_pie_chart(df, x_col, y_col)
         # Add other plotting calls as needed
 
         return
