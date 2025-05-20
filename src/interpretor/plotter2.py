@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import os
 import seaborn as sns
 import matplotlib.colors
@@ -639,6 +640,125 @@ def plot_pie_chart(df, x_col, y_col):
 
     fig.write_json(filepath, pretty=True, remove_uids=True)
 
+    return filepath
+
+def plot_area_chart_accumulation(df, x_col, y_col, categories_column):
+    # Group and aggregate data
+    grouped_data = df.groupby([x_col, categories_column])[y_col].sum().reset_index()
+    
+    # Calculate total per x_col
+    total_per_x = grouped_data.groupby(x_col)[y_col].sum().reset_index(name='total')
+    grouped_data = grouped_data.merge(total_per_x, on=x_col)
+    
+    # Calculate percentage contribution safely
+    grouped_data['percentage'] = np.where(
+        grouped_data['total'] != 0,
+        grouped_data[y_col] / grouped_data['total'],
+        0
+    )
+    
+    # Determine category order by total contribution
+    category_order = grouped_data.groupby(categories_column)[y_col].sum().sort_values(ascending=False).index.tolist()
+    
+    # Generate color palette
+    n_categories = len(category_order)
+    colors = sns.color_palette("viridis", n_categories)
+    hex_colors = [matplotlib.colors.rgb2hex(c) for c in colors]
+    
+    # Create the area chart
+    fig = px.area(
+        grouped_data,
+        x=x_col,
+        y=y_col,
+        color=categories_column,
+        category_orders={categories_column: category_order},
+        color_discrete_sequence=hex_colors,
+        hover_data={
+            'total': ':.0f',
+            'percentage': ':.1%',
+            categories_column: False
+        },
+    )
+    
+    # Customize hover template
+    fig.update_traces(
+        hovertemplate=(
+            "<b>%{x}</b><br>"
+            "<b>%{fullData.name}</b><br>"
+            "Value: %{y:,.0f}<br>"
+            "Total: %{total:,.0f}<br>"
+            "Percentage: %{percentage:.1%}<extra></extra>"
+        ),
+        line=dict(width=0.5, color='white')
+    )
+    
+    # Calculate total sum for annotation
+    total_sum = grouped_data[y_col].sum()
+    
+    # Customize layout
+    title_text = (
+        f"<span style='font-size:24px; font-weight:600;'>Accumulation of {y_col} by {categories_column}</span><br>"
+        f"<span style='font-size:18px; color:#606060'>Over {x_col}</span>"
+    )
+    
+    fig.update_layout(
+        title=dict(
+            text=title_text,
+            x=0.03,
+            y=0.95,
+            xanchor='left',
+            yanchor='top'
+        ),
+        xaxis=dict(
+            title=None,
+            tickfont=dict(size=12, color='#606060', family='Poppins'),
+            gridcolor='rgba(200, 200, 200, 0.2)',
+            linecolor='#d0d0d0',
+            showgrid=False,
+            automargin=True
+        ),
+        yaxis=dict(
+            title=None,
+            gridcolor='rgba(200, 200, 200, 0.2)',
+            showgrid=True,
+            zeroline=False,
+            tickformat=',.0f',
+            tickfont=dict(size=12, color='#808080')
+        ),
+        plot_bgcolor='white',
+        paper_bgcolor='#f8f9fa',
+        margin=dict(t=120, b=100, l=60, r=40),
+        font=dict(family='Poppins, Arial', color='#404040'),
+        legend=dict(
+            title=dict(text=categories_column, font=dict(size=12)),
+            orientation='h',
+            yanchor='bottom',
+            y=-0.3,
+            xanchor='center',
+            x=0.5
+        ),
+        annotations=[
+            dict(
+                x=0.95,
+                y=0.98,
+                xref="paper",
+                yref="paper",
+                text=f"<b>Total {y_col}:</b> {total_sum:,.0f}",
+                showarrow=False,
+                align="right",
+                font=dict(size=12),
+                bgcolor="rgba(255,255,255,0.9)",
+                bordercolor="#d0d0d0",
+                borderwidth=1
+            )
+        ]
+    )
+    
+    # Save to JSON
+    filename = f"area_accumulation_{y_col}_by_{categories_column}_over_{x_col}.json"
+    filepath = get_img_output_path(filename)
+    fig.write_json(filepath, pretty=True, remove_uids=True)
+    
     return filepath
 
 def get_img_output_path(filename: str) -> str:

@@ -143,6 +143,15 @@ class Interpretor(ParseTreeVisitor):
                     y_col = child.getText()
                 elif isinstance(child, ChartParser.CasesContext):
                     x_col = child.getText()
+        elif command_type == 'ACCUMULATION':  # area chart accumulation
+            print("passed")
+            for child in chart_func_ctx.getChildren():
+                if isinstance(child, ChartParser.RangeContext):
+                    categories_column = child.getText()
+                elif isinstance(child, ChartParser.CasesContext):
+                    y_col = child.getText()
+                elif isinstance(child, ChartParser.ContinuousVarContext):
+                    x_col = child.getText()
 
         # Handle other command types here...
 
@@ -170,6 +179,8 @@ class Interpretor(ParseTreeVisitor):
             Interpretor.img_path = plotter2.plot_scatter_plot(df, x_col, y_col)
         elif command_type == 'PROPORTION':
             Interpretor.img_path = plotter2.plot_pie_chart(df, x_col, y_col)
+        elif command_type == 'ACCUMULATION':
+            Interpretor.img_path = plotter2.plot_area_chart_accumulation(df, x_col, y_col, categories_column)
         # Add other plotting calls as needed
 
         return
