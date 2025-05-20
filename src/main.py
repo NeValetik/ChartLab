@@ -1,7 +1,7 @@
 from antlr4 import *
 from antlr2.ChartLexer import ChartLexer
 from antlr2.ChartParser import ChartParser
-from interpretor.interpretor import *
+from components.interpretor import *
 
 from PIL import Image
 
