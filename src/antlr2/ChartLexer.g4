@@ -59,8 +59,10 @@ RPAREN  : ')' ;
 LBRACE  : '{' ;
 RBRACE  : '}' ;
 WHILE   : 'while' ;
+STEP    : 'step' ;
 
 IDENTIFIER : LETTER (LETTER | DIGIT)* ;
+NUMBER: DIGIT+ ('.' DIGIT+)? ;
 
 fragment LETTER : [a-zA-Z] ;
 fragment DIGIT  : [0-9] ;

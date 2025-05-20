@@ -134,6 +134,15 @@ class ChartParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ChartParser#value.
+    def enterValue(self, ctx:ChartParser.ValueContext):
+        pass
+
+    # Exit a parse tree produced by ChartParser#value.
+    def exitValue(self, ctx:ChartParser.ValueContext):
+        pass
+
+
     # Enter a parse tree produced by ChartParser#condition.
     def enterCondition(self, ctx:ChartParser.ConditionContext):
         pass

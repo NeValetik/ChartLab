@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import numpy as np
 import os
@@ -759,6 +760,109 @@ def plot_area_chart_accumulation(df, x_col, y_col, categories_column):
     filepath = get_img_output_path(filename)
     fig.write_json(filepath, pretty=True, remove_uids=True)
     
+    return filepath
+
+
+def plot_histogram(df, column, step):
+    # Ensure numeric data
+    df[column] = pd.to_numeric(df[column], errors='coerce')
+
+    # Drop NaNs
+    df_clean = df.dropna(subset=[column])
+
+    # Determine bins
+    if step is not None:
+        min_val = df_clean[column].min()
+        max_val = df_clean[column].max()
+        buckets = int((max_val - min_val) / float(step))
+    else:
+        buckets = 5
+
+    # Create bin edges and labels
+    bins = pd.cut(df_clean[column], bins=buckets)
+    bin_counts = bins.value_counts().sort_index()
+    bin_starts = [interval.left for interval in bin_counts.index]
+    bin_ends = [interval.right for interval in bin_counts.index]
+    bin_labels = [f"{int(start)}–{int(end)}" for start, end in zip(bin_starts, bin_ends)]
+
+    # Create a DataFrame for Plotly Express
+    hist_data = pd.DataFrame({
+        "Range": bin_labels,
+        "Frequency": bin_counts.values
+    })
+
+
+
+    # Create Plotly Express bar chart
+    fig = px.bar(
+        hist_data,
+        x="Range",
+        y="Frequency",
+    )
+
+    # Update layout for styling
+    fig.update_layout(
+        title=dict(
+            text=f"<span style='font-size:26px; font-weight:600;'>Histogram of {column.title()}</span><br>"
+                 f"<span style='font-size:18px; color:#606060'>{buckets} Bins</span>",
+            x=0.03,
+            y=0.93,
+            xanchor='left',
+            yanchor='top'
+        ),
+        xaxis=dict(
+            title=f"{column.title()} Range",
+            tickfont=dict(size=14, color='#606060', family='Poppins'),
+            showgrid=False,
+            linecolor='#d0d0d0'
+        ),
+        yaxis=dict(
+            title="Frequency",
+            gridcolor='rgba(200, 200, 200, 0.2)',
+            zeroline=False,
+            tickfont=dict(size=12, color='#808080')
+        ),
+        plot_bgcolor='rgba(255, 255, 255, 0.95)',
+        paper_bgcolor='#f8f9fa',
+        margin=dict(t=120, b=100, l=60, r=40),
+        font=dict(family='Poppins, Arial', color='#404040'),
+        bargap=0.2,
+        bargroupgap=0.05,
+        hoverlabel=dict(
+            bgcolor='white',
+            bordercolor='#404040',
+            font_size=14
+        ),
+        separators=',.',
+        annotations=[
+            dict(
+                x=0.95,
+                y=0.98,
+                xref='paper',
+                yref='paper',
+                text=f"<b>Total Samples:</b> {df_clean[column].count():,}<br>"
+                     f"<b>Min–Max:</b> {df_clean[column].min():,.0f} – {df_clean[column].max():,.0f}",
+                showarrow=False,
+                align="right",
+                font=dict(size=12),
+                bgcolor="rgba(255,255,255,0.9)",
+                bordercolor="#d0d0d0",
+                borderwidth=1
+            )
+        ]
+    )
+
+    # Note: plotly.express doesn't support shapes directly, so decorative frame skipped.
+
+    filename = f"{column}_histogram.json"
+    filepath = get_img_output_path(filename)
+
+    fig.write_json(
+        filepath,
+        pretty=True,
+        remove_uids=True
+    )
+
     return filepath
 
 def get_img_output_path(filename: str) -> str:

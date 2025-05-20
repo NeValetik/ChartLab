@@ -41,10 +41,10 @@ chartFunction
     | SHOW_PROPORTION var BY cases
     | SHOW_SHARE var BY cases
     | SHOW_PERCENTAGE var BY cases
-    | SHOW_FREQUENCY var BY range
-    | SHOW_DISTRIBUTION var BY range
-    | SHOW_FREQUENCY_BUCKETS range BUCKETS
-    | ACCUMULATION continuousVar FOR cases FROM range
+    | SHOW_FREQUENCY var (STEP value)?
+    | SHOW_DISTRIBUTION var (STEP value)?
+    | SHOW_FREQUENCY_BUCKETS var BUCKETS
+    | ACCUMULATION continuousVar FOR cases FROM var
     | STACKED_TREND continuousVar FOR cases
     | SCATTER_PLOT var AND var
     | PATTERN var AND var
@@ -59,6 +59,7 @@ range      : IDENTIFIER TO IDENTIFIER ;
 subgroup   : IDENTIFIER ;
 cases      : IDENTIFIER ;
 trendKeyword : PROGRESSION_OF | TREND_OF | GROWTH_OF ;
+value       : IDENTIFIER | NUMBER ;
 
 condition
     : NOT? LPAREN? NOT* logicalOperation ((AND | OR) NOT? logicalOperation)* NOT?
