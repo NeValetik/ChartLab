@@ -73,6 +73,8 @@ class Interpretor(ParseTreeVisitor):
                     command_type = 'FREQUENCY'
                 elif token_type == ChartLexer.ACCUMULATION:
                     command_type = 'ACCUMULATION'
+                elif token_type == ChartLexer.STACKED_TREND:
+                    command_type = 'STACKED_TREND'
                 break  # Assume first terminal defines the command
         x_col, y_col = None, None
         group_col = None
@@ -147,14 +149,14 @@ class Interpretor(ParseTreeVisitor):
                     y_col = child.getText()
                 elif isinstance(child, ChartParser.ContinuousVarContext):
                     x_col = child.getText()
-        elif command_type == 'TREND_OF':
+        elif command_type == 'STACKED_TREND':
             for child in chart_func_ctx.getChildren():
-                    if isinstance(child, ChartParser.VarContext):
-                        categories_column = child.getText()
-                    elif isinstance(child, ChartParser.CasesContext):
-                        y_col = child.getText()
-                    elif isinstance(child, ChartParser.ContinuousVarContext):
-                        x_col = child.getText()
+                if isinstance(child, ChartParser.VarContext):
+                    categories_column = child.getText()
+                elif isinstance(child, ChartParser.CasesContext):
+                    y_col = child.getText()
+                elif isinstance(child, ChartParser.ContinuousVarContext):
+                    x_col = child.getText()
         elif command_type == 'FREQUENCY': # Histogram chart
             for child in chart_func_ctx.getChildren():
                 if isinstance(child, ChartParser.VarContext):
@@ -186,7 +188,7 @@ class Interpretor(ParseTreeVisitor):
             Interpretor.img_path = plot_pie_chart(df, x_col, y_col)
         elif command_type == 'ACCUMULATION':
             Interpretor.img_path = plot_area_chart_accumulation(df, x_col, y_col, categories_column)
-        elif command_type == 'TRENDTREND_OF':
+        elif command_type == 'STACKED_TREND':
             Interpretor.img_path = plot_area_chart_stacked_trend(df, x_col, y_col, categories_column)
         elif command_type == 'FREQUENCY':
             Interpretor.img_path = plot_histogram(df, x_col, step)
