@@ -10,27 +10,39 @@ from src.antlr2.ChartLexer import ChartLexer
 
 def read_data(file_path):
     if file_path.endswith(".csv"):
-        return pd.read_csv(file_path,  delimiter=';')
+        return pd.read_csv(file_path,  delimiter=',')
     elif file_path.endswith(".xlsx"):
         return pd.read_excel(file_path)
     else:
         raise ValueError("Unsupported file format. Use .csv or .xlsx")
 
-def plot_histogram(df, col, bins):
-    """
-       value_col = 'Salary'
-       group_col = 'Gender'
-       category_col = 'Company'
-       """
-    # Set Seaborn style for better aesthetics
+def plot_histogram(df, column, buckets=10):
     sns.set(style="whitegrid")
-    sns.histplot(df[col], bins=bins, kde=False)
-    plt.xlabel(col)
+
+    # Bin the data using equal-width intervals and extract edges
+    bins = pd.cut(df[column], bins=buckets)
+
+    # Count values in each bin
+    bin_counts = bins.value_counts().sort_index()
+
+    # Use bin edges for x-axis
+    bin_edges = [interval.right for interval in bin_counts.index]
+    bin_starts = [interval.left for interval in bin_counts.index]
+    bin_labels = [f"{int(start)}–{int(end)}" for start, end in zip(bin_starts, bin_edges)]
+
+    # Plot
+    plt.figure(figsize=(10, 6))
+    sns.barplot(x=bin_labels, y=bin_counts.values, palette="viridis")
+
+    # Label adjustments
+    plt.xlabel(f"{column.title()} Range")
     plt.ylabel("Frequency")
-    plt.title(f'Histogram of {col} with {bins} bins')
-    plt.xticks(rotation=45)
+    plt.title(f'Histogram of {column} with {buckets} bins')
+    plt.xticks(rotation=0)  # Straight labels
     plt.tight_layout()
     plt.show()
+
+
 
 
 
@@ -39,7 +51,7 @@ class ParseTreeData(ParseTreeVisitor):
         command = ""
         dataset = None
         x_value = None
-        y_value = None
+        step = None
 
         for child in tree.getChildren():
             if isinstance(child, ChartParser.ChartFunctionContext):
@@ -57,25 +69,22 @@ class ParseTreeData(ParseTreeVisitor):
                     if isinstance(grandchild_list[i], ChartParser.VarContext):
                         if x_value is None:
                             x_value = grandchild_list[i].getText()  # column to plot
-                    elif isinstance(grandchild_list[i], ChartParser.RangeContext):
-                        if y_value is None:
-                            y_value = grandchild_list[i].getText()  # range of bins
-
-
-        return command, dataset, x_value, y_value
+                    if isinstance(grandchild_list[i], ChartParser.ValueContext):
+                        if step is None:
+                            step = grandchild_list[i].getText()
+        return command, dataset, x_value, step
 
 
 def interpret_command(parse_tree):
     # Initialize data and extract information from the tree
     data = ParseTreeData()
-    command, dataset, column, bins = data.extract_data(parse_tree)
+    command, dataset, columns, step = data.extract_data(parse_tree)
     print(command)
-    print(bins)
 
 
 
     is_histogram_command = (
-            ("show frequency of" in command and "by" in command) or
+            ("show frequency of" in command) or
             ("show distribution of" in command and "by" in command) or
             ("show frequency in" in command)
     )
@@ -84,7 +93,7 @@ def interpret_command(parse_tree):
         print(f"Command '{command}' is not recognized for grouped bar charts.")
         return
 
-    if not dataset or not bins:
+    if not dataset or not columns:
         print("Error: Missing one of the required columns or dataset.")
         return
 
@@ -98,19 +107,18 @@ def interpret_command(parse_tree):
         print(f"Error: The dataset file {dataset}.csv was not found.")
         return
 
-    df.columns = [col.lower() for col in df.columns]
-    column = column.lower()
+    df.columns = [c.lower() for c in df.columns]
+    column = columns.lower()
+    df[column] = pd.to_numeric(df[column], errors='coerce')
+    min_val = df[column].min()
+    max_val = df[column].max()
+    buckets = int((max_val - min_val)/float(step))
 
     if column not in df.columns:
         print(f"Error: Column '{column}' not found in dataset.")
         return
-
-    try:
-        buckets = int(bins) if bins else 10
-    except ValueError:
-        print(f"Error: Invalid bin value '{bins}'. Using default of 10.")
-        buckets = 10
     # Plot
+
     plot_histogram(df, column, buckets)
 
 
@@ -129,7 +137,7 @@ def parseTree(input_text):
     return tree
 
 if __name__ == "__main__":
-    test_input = "with data from scores chart: show frequency of score by studentID"
+    test_input = "with data from scores chart: show frequency of score step 10"
     parse_tree = parseTree(test_input)
     interpret_command(parse_tree)
 

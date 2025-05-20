@@ -1,4 +1,4 @@
-# Generated from ChartParser.g4 by ANTLR 4.13.2
+# Generated from C:/Users/Asus/PycharmProjects/ChartLab/src/antlr2/ChartParser.g4 by ANTLR 4.13.2
 from antlr4 import *
 if "." in __name__:
     from .ChartParser import ChartParser
@@ -131,6 +131,15 @@ class ChartParserListener(ParseTreeListener):
 
     # Exit a parse tree produced by ChartParser#trendKeyword.
     def exitTrendKeyword(self, ctx:ChartParser.TrendKeywordContext):
+        pass
+
+
+    # Enter a parse tree produced by ChartParser#value.
+    def enterValue(self, ctx:ChartParser.ValueContext):
+        pass
+
+    # Exit a parse tree produced by ChartParser#value.
+    def exitValue(self, ctx:ChartParser.ValueContext):
         pass
 
 

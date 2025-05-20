@@ -69,10 +69,13 @@ class Interpretor(ParseTreeVisitor):
                     command_type = 'SCATTER'
                 elif token_type == ChartLexer.SHOW_PROPORTION or token_type == ChartLexer.SHOW_SHARE or token_type == ChartLexer.SHOW_PERCENTAGE:
                     command_type = 'PROPORTION'
+                elif token_type == ChartLexer.SHOW_FREQUENCY or token_type == ChartLexer.SHOW_FREQUENCY_BUCKETS or token_type == ChartLexer.SHOW_DISTRIBUTION:
+                    command_type = 'FREQUENCY'
                 # Add other command types here as needed
                 break  # Assume first terminal defines the command
         x_col, y_col = None, None
         group_col = None
+        step = None
 
         # Extract parameters based on command type
         if command_type == 'COMPARE':
@@ -143,12 +146,18 @@ class Interpretor(ParseTreeVisitor):
                     y_col = child.getText()
                 elif isinstance(child, ChartParser.CasesContext):
                     x_col = child.getText()
+        elif command_type == 'FREQUENCY': # histogram
+            for child in chart_func_ctx.getChildren():
+                if isinstance(child, ChartParser.VarContext):
+                    x_col = child.getText()
+                if isinstance(child, ChartParser.ValueContext):
+                    step = child.getText()
 
         # Handle other command types here...
 
         df.columns = df.columns.str.strip().str.lower()
 
-        if x_col not in df.columns or y_col not in df.columns or (group_col and group_col not in df.columns):
+        if x_col not in df.columns or (y_col and y_col not in df.columns) or (group_col and group_col not in df.columns):
             print(f"Error: One or more columns ({x_col, y_col}) not found not found in dataset '{dataset}'.")
             return
 
@@ -170,6 +179,8 @@ class Interpretor(ParseTreeVisitor):
             Interpretor.img_path = plotter2.plot_scatter_plot(df, x_col, y_col)
         elif command_type == 'PROPORTION':
             Interpretor.img_path = plotter2.plot_pie_chart(df, x_col, y_col)
+        elif command_type == 'FREQUENCY':
+            Interpretor.img_path = plotter2.plot_histogram(df, x_col, step)
         # Add other plotting calls as needed
 
         return
