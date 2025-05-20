@@ -71,6 +71,8 @@ class Interpretor(ParseTreeVisitor):
                     command_type = 'PROPORTION'
                 elif token_type == ChartLexer.SHOW_FREQUENCY or token_type == ChartLexer.SHOW_FREQUENCY_BUCKETS or token_type == ChartLexer.SHOW_DISTRIBUTION:
                     command_type = 'FREQUENCY'
+                elif token_type == ChartLexer.ACCUMULATION:
+                    command_type = 'ACCUMULATION'
                 # Add other command types here as needed
                 break  # Assume first terminal defines the command
         x_col, y_col = None, None
@@ -148,9 +150,8 @@ class Interpretor(ParseTreeVisitor):
                     x_col = child.getText()
 
         elif command_type == 'ACCUMULATION':  # area chart accumulation
-            print("passed")
             for child in chart_func_ctx.getChildren():
-                if isinstance(child, ChartParser.RangeContext):
+                if isinstance(child, ChartParser.VarContext):
                     categories_column = child.getText()
                 elif isinstance(child, ChartParser.CasesContext):
                     y_col = child.getText()
