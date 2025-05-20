@@ -44,7 +44,7 @@ chartFunction
     | SHOW_FREQUENCY var (STEP value)?
     | SHOW_DISTRIBUTION var (STEP value)?
     | SHOW_FREQUENCY_BUCKETS var BUCKETS
-    | ACCUMULATION continuousVar FOR cases FROM range
+    | ACCUMULATION continuousVar FOR cases FROM var
     | STACKED_TREND continuousVar FOR cases
     | SCATTER_PLOT var AND var
     | PATTERN var AND var

@@ -26,15 +26,16 @@ def visualize_tree(tree, parser):
 
 def main():
     input_code = """
-while (x == y) {
-    with revenue from sales chart: 
-        compare revenue for region 
-    with growth from report chart: 
-        show share of income by year
-}
+with sales from orders chart:
+    compare revenue for regions
 
-with growth from report chart:  
-    show share of income by year
+with sales from orders chart:
+    compare revenue for regions
+
+while ( x < b ) {
+    with sales from orders chart:
+        compare revenue for regions
+}    
 """.strip()
 
     # Initialize input stream and lexer

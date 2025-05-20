@@ -1,4 +1,4 @@
-# Generated from C:/Users/Asus/PycharmProjects/ChartLab/src/antlr2/ChartParser.g4 by ANTLR 4.13.2
+# Generated from ChartParser.g4 by ANTLR 4.13.2
 from antlr4 import *
 if "." in __name__:
     from .ChartParser import ChartParser
