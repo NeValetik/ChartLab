@@ -6,6 +6,8 @@ import os
 import seaborn as sns
 import matplotlib.colors
 import plotly.express as px
+from matplotlib import pyplot as plt
+
 
 def plot_comparison(df, value_col, category_col):
     # Sort and aggregate data
@@ -1048,3 +1050,92 @@ def get_img_output_path(filename: str) -> str:
     output_dir = os.path.join(src_dir, "data", "img")
     os.makedirs(output_dir, exist_ok=True)
     return os.path.join(output_dir, filename)
+
+def plot_bubble(df, x_col, y_col, size_col, category_col):
+    # Ensure valid types
+    df = df.copy()
+    df[size_col] = pd.to_numeric(df[size_col], errors='coerce').fillna(0)
+
+    # Normalize bubble sizes to enhance visual consistency
+    size_scale = 3000 * df[size_col] / df[size_col].max()
+
+    # Generate colors using seaborn's palette
+    unique_categories = df[category_col].nunique()
+    colors = sns.color_palette("viridis", unique_categories)
+    hex_colors = [matplotlib.colors.rgb2hex(c) for c in colors]
+
+    # Assign each category a color
+    color_map = dict(zip(df[category_col].unique(), hex_colors))
+    df['color'] = df[category_col].map(color_map)
+
+    # Create interactive bubble chart
+    fig = px.scatter(
+        df,
+        x=x_col,
+        y=y_col,
+        size=size_col,
+        color=category_col,
+        text=category_col,
+        size_max=60,
+        color_discrete_sequence=hex_colors,
+        hover_name=category_col,
+        hover_data={x_col: True, y_col: True, size_col: ':.0f'},
+        template='plotly_white',
+        opacity=0.85
+    )
+
+    # Update traces
+    fig.update_traces(
+        textposition='middle center',
+        textfont=dict(size=12, color='black'),
+        marker=dict(line=dict(width=1, color='white')),
+        selector=dict(mode='markers'),
+        hovertemplate=(
+            f"<b>%{{hovertext}}</b><br>"
+            f"{x_col}: %{{x}}<br>"
+            f"{y_col}: %{{y}}<br>"
+            f"{size_col}: %{{marker.size:.0f}}<extra></extra>"
+        )
+    )
+
+    # Update layout to match others
+    fig.update_layout(
+        title=dict(
+            text=f"<span style='font-size:24px; font-weight:600;'>{category_col} Bubble Chart</span><br>"
+                 f"<span style='font-size:16px; color:#606060'>Bubble size based on {size_col}</span>",
+            x=0.03,
+            y=0.95,
+            xanchor='left',
+            yanchor='top'
+        ),
+        xaxis=dict(
+            title=dict(text=x_col, font=dict(size=14, family='Arial')),
+            tickfont=dict(size=12),
+            gridcolor='rgba(220,220,220,0.3)'
+        ),
+        yaxis=dict(
+            title=dict(text=y_col, font=dict(size=14, family='Arial')),
+            tickfont=dict(size=12),
+            gridcolor='rgba(220,220,220,0.3)'
+        ),
+        plot_bgcolor='white',
+        paper_bgcolor='#f8f9fa',
+        legend=dict(
+            title=dict(text=category_col),
+            font=dict(size=12)
+        ),
+        margin=dict(t=100, b=80, l=60, r=40),
+        font=dict(family='Poppins, Arial', color='#404040'),
+    )
+
+    # Save to JSON file like others
+    filename = f"{x_col}_{y_col}_bubble_chart.json"
+    filepath = get_img_output_path(filename)
+
+    fig.write_json(
+        filepath,
+        pretty=True,
+        remove_uids=True
+    )
+
+    return filepath
