@@ -1,6 +1,6 @@
 
 ```
-<program> ::= <statement>+ EOF
+<program> ::= { <statement> } EOF
 
 <statement> ::= <loop> | <command>
 
