@@ -11,36 +11,36 @@
 <block> ::= "{" <statement>+ "}"
 
 <chartFunction> ::=
-    "compare" <var> "for" <cases> |
+    "compare" <var> "for" <cases> |   BAR CHART
     "differences" <var> "for" <cases> |
     "contrast" <var> "for" <cases> |
     "versus" <var> "for" <cases> |
 
-    "compare" <var> "split by" <subgroup> "for" <cases> |
+    "compare" <var> "split by" <subgroup> "for" <cases> | -- BAR CHART (GROUPED/SPLIT)
     "compare" <var> "grouped by" <subgroup> "for" <cases> |
     "differences within" <subgroup> "for" <cases> |
 
-    "show" <var> "stacked by" <subgroup> "for" <cases> |
+    "show" <var> "stacked by" <subgroup> "for" <cases> | -- BAR CHART (STACKED)
     "show" <var> "subgroups" <subgroup> "for" <cases> |
 
-    "show correlation between" <continuousVar> "and" <continuousVar> |
+    "show correlation between" <continuousVar> "and" <continuousVar> | --  LINE GRAPH
     "log" <trendKeyword> <continuousVar> "from" <range> |
 
-    "show proportion of" <var> "by" <cases> |
+    "show proportion of" <var> "by" <cases> | --  PIE CHART
     "show share of" <var> "by" <cases> |
     "show percentage of" <var> "by" <cases> |
 
-    "show frequency of" <var> [ "step" <value> ] |
+    "show frequency of" <var> [ "step" <value> ] |  -- HISTOGRAM
     "show distribution of" <var> [ "step" <value> ] |
     "show frequency in" <var> "buckets" |
 
-    "accumulation of" <continuousVar> "for" <cases> "from" <var> |
+    "accumulation of" <continuousVar> "for" <cases> "from" <var> | -- AREA CHART
     "stacked trend of" <continuousVar> "for" <cases> "from" <var> |
 
-    "scatter plot of" <var> "and" <var> |
+    "scatter plot of" <var> "and" <var> | -- SCATTER PLOT
     "pattern of" <var> "and" <var> |
 
-    "bubble of" <var> "," <var> "," <var> "for" <cases>
+    "bubble of" <var> "," <var> "," <var> "for" <cases>  -- BUBBLE CHART
 
 <data> ::= <var> | <continuousVar> | <var> "at" <var>
 
