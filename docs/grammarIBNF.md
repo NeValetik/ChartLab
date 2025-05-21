@@ -20,9 +20,9 @@
                  | "show share of" <var> by <cases> 
                  | "show percentage of" <var> by <cases> 
                  
-                 | "show frequency of" <var> "by" <range>  # HISTOGRAM
-                 | "show distribution of" <var> "by" <range> 
-                 | "show frequency in" <range> "buckets" 
+                 | "show frequency of" <var> ["step" <value>]  # HISTOGRAM
+                 | "show distribution of" <var> ["step" <value>] 
+                 | "show frequency in" <var> "buckets" 
                  
                  | "accumulation of" <continuousVar> "for" <cases> "from" <range>  # AREA CHART (Accumulation)
                  | "stacked trend of" <continuousVar> "for" <cases>  # AREA CHART (Stacked Trend)
@@ -35,6 +35,8 @@
 <table> ::= <identifier>
 
 <var> ::= <identifier>
+
+<value> ::= <identifier> | <number>
 
 <data> ::= <var> | <continuousVar> | <var> "at" <var>
 
@@ -62,7 +64,7 @@
 <identifier> ::= <letter> { <letter> | <digit> }  
 
 <trendKeyword> ::= "progression of" | "trend of" | "growth of"
-
+<number> ::= {<digit>} [ "." {<digit>} ]
 <letter> ::= "a"|"b"|...|"z"|"A"|"B"|...|"Z"
 <digit> ::= "0"|"1"|...|"9"
 ```
