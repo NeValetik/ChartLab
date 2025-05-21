@@ -1,3 +1,5 @@
+import random
+
 import numpy as np
 import pandas as pd
 import os
@@ -452,26 +454,14 @@ def plot_scatter_plot(
     df,
     x_col,
     y_col,
-    point_color="blue",
-    point_size=8,
+    point_size=15,
     marker_symbol="circle",
     label_col=None
 ):
-    """
-    Generates an interactive scatter plot and exports it as a JSON file.
 
-    Parameters:
-        df (pd.DataFrame): Data source.
-        x_col (str): Column name for x-axis.
-        y_col (str): Column name for y-axis.
-        point_color (str): Marker color.
-        point_size (int): Size of points.
-        marker_symbol (str): Marker shape (e.g., 'circle', 'diamond').
-        label_col (str or None): Optional column for text labels on hover.
+    import pandas as pd
+    import plotly.express as px
 
-    Returns:
-        str: Path to the saved JSON file.
-    """
     if x_col not in df.columns or y_col not in df.columns:
         raise ValueError(f"Columns '{x_col}' or '{y_col}' not found in DataFrame.")
 
@@ -481,7 +471,12 @@ def plot_scatter_plot(
         except Exception:
             pass
 
-    # Define hover template
+    # Use defined color palette from original example
+    color_palette = ['#1C0B85', '#8D2C8C', '#C7636B', '#EBAD51', '#1E88E5']
+    choice = int(random.choice([0, 1, 2, 3, 4]))
+    point_color = color_palette[choice]  # Consistently styled color (e.g., purple)
+
+    # Define custom hovertemplate
     hover = f"<b>{x_col}</b>: %{{x}}<br><b>{y_col}</b>: %{{y}}"
     if label_col and label_col in df.columns:
         hover += f"<br><b>Label</b>: %{{customdata[0]}}"
@@ -490,7 +485,6 @@ def plot_scatter_plot(
         df,
         x=x_col,
         y=y_col,
-        title=f"Scatter plot showing the relation between {y_col} vs {x_col}",
         custom_data=[df[label_col]] if label_col else None
     )
 
@@ -499,41 +493,73 @@ def plot_scatter_plot(
             size=point_size,
             color=point_color,
             symbol=marker_symbol,
-            line=dict(width=1, color='DarkSlateGrey')
+            line=dict(width=1.5, color='white'),
+            opacity=0.9
         ),
-        mode="markers",
-        hovertemplate=hover + "<extra></extra>"
+        hovertemplate=hover + "<extra></extra>",
+        mode="markers"
     )
 
     fig.update_layout(
         title=dict(
-            text=f"<b>Scatter plot showing the relation between {x_col.capitalize()} vs {y_col.capitalize()}</b>",
-            font=dict(size=18, family="Arial", color="black"),
-            x=0.5,
-            xanchor='center'
+            text=f"<span style='font-size:26px; font-weight:600;'>{x_col.capitalize()} vs {y_col.capitalize()}</span><br>"
+                 f"<span style='font-size:18px; color:#606060'>Scatter Plot</span>",
+            x=0.03,
+            y=0.93,
+            xanchor='left',
+            yanchor='top'
         ),
         xaxis=dict(
-            title=dict(text=f"<b>{x_col.capitalize()}</b>", font=dict(size=14, family="Arial")),
-            tickangle=-45,
+            title=x_col.capitalize(),
+            tickfont=dict(size=14, color='#606060', family='Poppins'),
+            gridcolor='rgba(200, 200, 200, 0.1)',
+            linecolor='#d0d0d0',
             showgrid=True,
-            gridcolor="rgba(211, 211, 211, 0.5)",
-            zeroline=False
+            automargin=True
         ),
         yaxis=dict(
-            title=dict(text=f"<b>{y_col.capitalize()}</b>", font=dict(size=14, family="Arial")),
+            title=y_col.capitalize(),
+            gridcolor='rgba(200, 200, 200, 0.2)',
             showgrid=True,
-            gridcolor="rgba(211, 211, 211, 0.5)",
-            zeroline=False
+            zeroline=False,
+            tickfont=dict(size=12, color='#808080')
         ),
-        plot_bgcolor="white",
+        plot_bgcolor='rgba(255, 255, 255, 0.95)',
+        paper_bgcolor='#f8f9fa',
+        margin=dict(t=120, b=100, l=60, r=40),
+        font=dict(family='Poppins, Arial', color='#404040'),
         hovermode="closest",
-        margin=dict(t=70, b=100, l=60, r=30),
-        legend=dict(
-            title_text="",
-            bgcolor="rgba(255, 255, 255, 0.8)",
-            bordercolor="LightGrey",
-            borderwidth=1
-        )
+        hoverdistance=100,
+        separators=',.',
+
+    )
+
+    # Add decorative frame
+    fig.add_shape(
+        type="rect",
+        xref="paper",
+        yref="paper",
+        x0=0, y0=0,
+        x1=1, y1=1,
+        line=dict(color="#e0e0e0", width=2),
+        fillcolor="rgba(0,0,0,0)"
+    )
+
+    # Add dynamic annotation summary
+    total_points = len(df)
+    fig.add_annotation(
+        x=0.95,
+        y=0.98,
+        xref="paper",
+        yref="paper",
+        text=f"<b>Total Points:</b> {total_points:,}<br>"
+             f"<b>Marker:</b> {marker_symbol.capitalize()}",
+        showarrow=False,
+        align="right",
+        font=dict(size=12),
+        bgcolor="rgba(255,255,255,0.9)",
+        bordercolor="#d0d0d0",
+        borderwidth=1
     )
 
     filename = f"{y_col}_vs_{x_col}.json"
@@ -542,6 +568,7 @@ def plot_scatter_plot(
     fig.write_json(filepath, pretty=True, remove_uids=True)
 
     return filepath
+
 
 def plot_pie_chart(df, x_col, y_col):
     # Convert y_col to numeric if it's not already
