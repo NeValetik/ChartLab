@@ -182,8 +182,6 @@ class Interpretor(ParseTreeVisitor):
         df.columns = df.columns.str.strip().str.lower()
         x_col = x_col.lower()
         y_col = y_col.lower()
-        bubble_size = bubble_size.lower()
-        bubble_data = bubble_data.lower()
 
         if x_col not in df.columns or (y_col and y_col not in df.columns) or (group_col and group_col not in df.columns):
             print(f"Error: One or more columns ({x_col, y_col}) not found not found in dataset '{dataset}'.")
