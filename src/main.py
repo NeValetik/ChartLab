@@ -14,10 +14,9 @@ def create_chart(content):
     parser = ChartParser(token_stream)
     tree = parser.command()
 
-    # Temporar solution: our interpreter will return the PATH of the generated image, instead of actual IMAGE
     interpretor = Interpretor()
-    img_path = interpretor.walk_tree(tree)
-    return img_path
+    json_list = interpretor.walk_tree(tree)
+    return json_list
 
 if __name__ == '__main__':
     with open("data/templates/example1.ch" "r", encoding="utf-8") as file:

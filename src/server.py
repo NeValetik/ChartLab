@@ -1,4 +1,4 @@
-from flask import Flask, request, send_file, jsonify
+from flask import Flask, request, jsonify
 from main import create_chart
 import os
 
@@ -10,15 +10,11 @@ def generate_image():
     if not content:
         return jsonify("No text provided", 400)
 
-    json_path = create_chart(content["code"])
-    if json_path is None:
-        json_path = "data/img/no-image.png"
+    json_list = create_chart(content["code"])
+    if json_list is None:
+        return jsonify("Internal Error: No json_list was returned.", 400)
 
-    return send_file(
-        json_path,
-        mimetype='application/json',
-        as_attachment=False
-    )
+    return jsonify({"plots": json_list})
 
 @app.route('/api/v1/files', methods=['GET'])
 def list_files():

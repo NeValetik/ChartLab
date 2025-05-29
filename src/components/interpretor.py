@@ -11,28 +11,15 @@ from antlr2.ChartParser import ChartParser
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
 class Interpretor(ParseTreeVisitor):
-    img_path = None
+    def __init__(self):
+        super().__init__()
+        self.json_list = []
 
     def walk_tree(self, tree):
-        if tree is None:
-            return
-        
-        self.interpret_node(tree)
-        if Interpretor.img_path is not None:
-            img_path = Interpretor.img_path
-            Interpretor.img_path = None
-            return img_path
-
-        for i in range(tree.getChildCount()):
-            self.walk_tree(tree.getChild(i))
-        
-        return
-
-    def interpret_node(self, node):
-        if isinstance(node, ChartParser.CommandContext):
-            self.interpret_command(node)
-        elif isinstance(node, ChartParser.ChartFunctionContext):
-            pass  # Handled within interpret_command
+        for node in tree.getChildren():  # or try to change tree.getChildren() with tree.command(), which should return all nodes of type CommandContext
+            if isinstance(node, ChartParser.CommandContext):
+                self.interpret_command(node)
+        return self.json_list
 
     def interpret_command(self, node):
         dataset = None
@@ -172,24 +159,24 @@ class Interpretor(ParseTreeVisitor):
 
         if command_type == 'COMPARE' or command_type == 'DIFFERENCES':
             if group_col:
-                Interpretor.img_path = plot_grouped_bar_chart(df, y_col, x_col, group_col)
+                plot_grouped_bar_chart(self, df, y_col, x_col, group_col)
             else:
-                Interpretor.img_path = plot_comaprison_daniela_version(df, y_col, x_col)
+                plot_comaprison_daniela_version(self, df, y_col, x_col)
         elif command_type == 'CORRELATION':
-            Interpretor.img_path = plot_line_graph(df, x_col, y_col)
+            plot_line_graph(self, df, x_col, y_col)
         elif command_type == 'SHOW':
             if group_col:
-                Interpretor.img_path = plot_stacked_bar_chart(df, y_col, x_col, group_col)
+                plot_stacked_bar_chart(self, df, y_col, x_col, group_col)
             else:
                 pass
         elif command_type == 'SCATTER':
-            Interpretor.img_path = plot_scatter_plot(df, x_col, y_col)
+            plot_scatter_plot(self, df, x_col, y_col)
         elif command_type == 'PROPORTION':
-            Interpretor.img_path = plot_pie_chart(df, x_col, y_col)
+            plot_pie_chart(self, df, x_col, y_col)
         elif command_type == 'ACCUMULATION':
-            Interpretor.img_path = plot_area_chart_accumulation(df, x_col, y_col, categories_column)
+            plot_area_chart_accumulation(self, df, x_col, y_col, categories_column)
         elif command_type == 'STACKED_TREND':
-            Interpretor.img_path = plot_area_chart_stacked_trend(df, x_col, y_col, categories_column)
+            plot_area_chart_stacked_trend(self, df, x_col, y_col, categories_column)
         elif command_type == 'FREQUENCY':
-            Interpretor.img_path = plot_histogram(df, x_col, step)
+            plot_histogram(self, df, x_col, step)
         return

@@ -1,11 +1,10 @@
-import numpy as np
 import pandas as pd
-import os
 import seaborn as sns
-import matplotlib.colors
 import plotly.express as px
+import matplotlib
+import plotly.io as pio
 
-def plot_comparison(df, value_col, category_col):
+def plot_comparison(interpretor_instance, df, value_col, category_col):
     # Sort and aggregate data
     grouped_data = df.groupby(category_col)[value_col].sum().sort_values(ascending=False).reset_index()
 
@@ -50,19 +49,10 @@ def plot_comparison(df, value_col, category_col):
         margin=dict(t=60, b=100)
     )
 
-    filename = f"{value_col}_vs_{category_col}.json"
-    filepath = get_img_output_path(filename)
-    
-    # Write to JSON with proper formatting
-    fig.write_json(
-        filepath,
-        pretty=True,  # For human-readable formatting
-        remove_uids=True  # Cleaner output
-    )
-    
-    return filepath
+    json_str = pio.to_json(fig, pretty=True, remove_uids=True)
+    interpretor_instance.json_list.append(json_str)
 
-def plot_comaprison_daniela_version(df, value_col, category_col):
+def plot_comaprison_daniela_version(interpretor_instance, df, value_col, category_col):
     # Sort and aggregate data
     grouped_data = df.groupby(category_col)[value_col].sum().sort_values(ascending=False).reset_index()
     
@@ -194,19 +184,10 @@ def plot_comaprison_daniela_version(df, value_col, category_col):
         borderwidth=1
     )
 
-    filename = f"{value_col}_vs_{category_col}.json"
-    filepath = get_img_output_path(filename)
-    
-    # Write to JSON with proper formatting
-    fig.write_json(
-        filepath,
-        pretty=True,  # For human-readable formatting
-        remove_uids=True  # Cleaner output
-    )
-    
-    return filepath
+    json_str = pio.to_json(fig, pretty=True, remove_uids=True)
+    interpretor_instance.json_list.append(json_str)
 
-def plot_line_graph(df, x_col, y_col):
+def plot_line_graph(interpretor_instance, df, x_col, y_col):
     # Convert to datetime
     df[y_col] = pd.to_datetime(df[y_col])
 
@@ -253,19 +234,10 @@ def plot_line_graph(df, x_col, y_col):
         )
     )
 
-    filename = f"{x_col}_and_{y_col}.json"
-    filepath = get_img_output_path(filename)
-    
-    # Write to JSON with proper formatting
-    fig.write_json(
-        filepath,
-        pretty=True,  # For human-readable formatting
-        remove_uids=True  # Cleaner output
-    )
-    
-    return filepath
+    json_str = pio.to_json(fig, pretty=True, remove_uids=True)
+    interpretor_instance.json_list.append(json_str)
 
-def plot_grouped_bar_chart(df, y_col, x_col, group_col):
+def plot_grouped_bar_chart(interpretor_instance, df, y_col, x_col, group_col):
     # Aggregate data
     grouped_data = df.groupby([x_col, group_col])[y_col].sum().reset_index()
 
@@ -338,19 +310,10 @@ def plot_grouped_bar_chart(df, y_col, x_col, group_col):
         )
     )
 
-    # Save the figure
-    filename = f"{y_col}_by_{x_col}_grouped_by_{group_col}.json"
-    filepath = get_img_output_path(filename)
+    json_str = pio.to_json(fig, pretty=True, remove_uids=True)
+    interpretor_instance.json_list.append(json_str)
 
-    fig.write_json(
-        filepath,
-        pretty=True,
-        remove_uids=True
-    )
-
-    return filepath
-
-def plot_stacked_bar_chart(df, y_col, x_col, group_col):
+def plot_stacked_bar_chart(interpretor_instance, df, y_col, x_col, group_col):
     # Aggregate the data
     grouped_data = df.groupby([x_col, group_col])[y_col].sum().reset_index()
 
@@ -437,41 +400,10 @@ def plot_stacked_bar_chart(df, y_col, x_col, group_col):
         borderwidth=1
     )
 
-    # Save as JSON
-    filename = f"{y_col}_stacked_by_{group_col}_on_{x_col}.json"
-    filepath = get_img_output_path(filename)
-    fig.write_json(
-        filepath,
-        pretty=True,
-        remove_uids=True
-    )
+    json_str = pio.to_json(fig, pretty=True, remove_uids=True)
+    interpretor_instance.json_list.append(json_str)
 
-    return filepath
-
-def plot_scatter_plot(
-    df,
-    x_col,
-    y_col,
-    point_color="blue",
-    point_size=8,
-    marker_symbol="circle",
-    label_col=None
-):
-    """
-    Generates an interactive scatter plot and exports it as a JSON file.
-
-    Parameters:
-        df (pd.DataFrame): Data source.
-        x_col (str): Column name for x-axis.
-        y_col (str): Column name for y-axis.
-        point_color (str): Marker color.
-        point_size (int): Size of points.
-        marker_symbol (str): Marker shape (e.g., 'circle', 'diamond').
-        label_col (str or None): Optional column for text labels on hover.
-
-    Returns:
-        str: Path to the saved JSON file.
-    """
+def plot_scatter_plot(interpretor_instance, df, x_col, y_col, point_color="blue", point_size=8,marker_symbol="circle", label_col=None):
     if x_col not in df.columns or y_col not in df.columns:
         raise ValueError(f"Columns '{x_col}' or '{y_col}' not found in DataFrame.")
 
@@ -536,14 +468,10 @@ def plot_scatter_plot(
         )
     )
 
-    filename = f"{y_col}_vs_{x_col}.json"
-    filepath = get_img_output_path(filename)
+    json_str = pio.to_json(fig, pretty=True, remove_uids=True)
+    interpretor_instance.json_list.append(json_str)
 
-    fig.write_json(filepath, pretty=True, remove_uids=True)
-
-    return filepath
-
-def plot_pie_chart(df, x_col, y_col):
+def plot_pie_chart(interpretor_instance, df, x_col, y_col):
     # Convert y_col to numeric if it's not already
     if not pd.api.types.is_numeric_dtype(df[y_col]):
         # Clean and convert numeric values
@@ -634,15 +562,10 @@ def plot_pie_chart(df, x_col, y_col):
         ),
     )
 
-    # Save visualization
-    filename = f"pie_{y_col}_by_{x_col}.json"
-    filepath = get_img_output_path(filename)
+    json_str = pio.to_json(fig, pretty=True, remove_uids=True)
+    interpretor_instance.json_list.append(json_str)
 
-    fig.write_json(filepath, pretty=True, remove_uids=True)
-
-    return filepath
-
-def plot_area_chart_accumulation(df, x_col, y_col, categories_column):
+def plot_area_chart_accumulation(interpretor_instance, df, x_col, y_col, categories_column):
     # Convert year to proper integer type (critical fix)
     df[x_col] = df[x_col].astype(int)
 
@@ -768,16 +691,12 @@ def plot_area_chart_accumulation(df, x_col, y_col, categories_column):
             )
         ]
     )
-    
-    # Save to JSON
-    filename = f"area_accumulation_{y_col}_by_{categories_column}_over_{x_col}.json"
-    filepath = get_img_output_path(filename)
-    fig.write_json(filepath, pretty=True, remove_uids=True)
-    
-    return filepath
+
+    json_str = pio.to_json(fig, pretty=True, remove_uids=True)
+    interpretor_instance.json_list.append(json_str)
 
 
-def plot_histogram(df, column, step):
+def plot_histogram(interpretor_instance, df, column, step):
     # Ensure numeric data
     df[column] = pd.to_numeric(df[column], errors='coerce')
 
@@ -804,8 +723,6 @@ def plot_histogram(df, column, step):
         "Range": bin_labels,
         "Frequency": bin_counts.values
     })
-
-
 
     # Create Plotly Express bar chart
     fig = px.bar(
@@ -866,20 +783,10 @@ def plot_histogram(df, column, step):
         ]
     )
 
-    # Note: plotly.express doesn't support shapes directly, so decorative frame skipped.
+    json_str = pio.to_json(fig, pretty=True, remove_uids=True)
+    interpretor_instance.json_list.append(json_str)
 
-    filename = f"{column}_histogram.json"
-    filepath = get_img_output_path(filename)
-
-    fig.write_json(
-        filepath,
-        pretty=True,
-        remove_uids=True
-    )
-
-    return filepath
-
-def plot_area_chart_stacked_trend(df, x_col, y_col, categories_column):
+def plot_area_chart_stacked_trend(interpretor_instance, df, x_col, y_col, categories_column):
     # Convert x_col to proper type (datetime if possible)
     try:
         df[x_col] = pd.to_datetime(df[x_col])
@@ -1008,16 +915,5 @@ def plot_area_chart_stacked_trend(df, x_col, y_col, categories_column):
             hoverformat="%b %d, %Y"
         )
 
-    # Save visualization
-    filename = f"stacked_trend_{y_col}_by_{categories_column}_over_{x_col}.json"
-    filepath = get_img_output_path(filename)
-    fig.write_json(filepath, pretty=True, remove_uids=True)
-    
-    return filepath
-
-def get_img_output_path(filename: str) -> str:
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    src_dir = os.path.abspath(os.path.join(script_dir, ".."))
-    output_dir = os.path.join(src_dir, "data", "img")
-    os.makedirs(output_dir, exist_ok=True)
-    return os.path.join(output_dir, filename)
+    json_str = pio.to_json(fig, pretty=True, remove_uids=True)
+    interpretor_instance.json_list.append(json_str)
