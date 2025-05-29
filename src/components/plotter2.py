@@ -1,8 +1,10 @@
+import random
 import pandas as pd
 import seaborn as sns
 import plotly.express as px
 import matplotlib
 import plotly.io as pio
+from matplotlib import pyplot as plt
 
 def plot_comparison(interpretor_instance, df, value_col, category_col):
     # Sort and aggregate data
@@ -403,7 +405,7 @@ def plot_stacked_bar_chart(interpretor_instance, df, y_col, x_col, group_col):
     json_str = pio.to_json(fig, pretty=True, remove_uids=True)
     interpretor_instance.json_list.append(json_str)
 
-def plot_scatter_plot(interpretor_instance, df, x_col, y_col, point_color="blue", point_size=8,marker_symbol="circle", label_col=None):
+def plot_scatter_plot(interpretor_instance, df, x_col, y_col, point_size=15, marker_symbol="circle", label_col=None):
     if x_col not in df.columns or y_col not in df.columns:
         raise ValueError(f"Columns '{x_col}' or '{y_col}' not found in DataFrame.")
 
@@ -413,7 +415,12 @@ def plot_scatter_plot(interpretor_instance, df, x_col, y_col, point_color="blue"
         except Exception:
             pass
 
-    # Define hover template
+    # Use defined color palette from original example
+    color_palette = ['#1C0B85', '#8D2C8C', '#C7636B', '#EBAD51', '#1E88E5']
+    choice = int(random.choice([0, 1, 2, 3, 4]))
+    point_color = color_palette[choice]  # Consistently styled color (e.g., purple)
+
+    # Define custom hovertemplate
     hover = f"<b>{x_col}</b>: %{{x}}<br><b>{y_col}</b>: %{{y}}"
     if label_col and label_col in df.columns:
         hover += f"<br><b>Label</b>: %{{customdata[0]}}"
@@ -422,7 +429,6 @@ def plot_scatter_plot(interpretor_instance, df, x_col, y_col, point_color="blue"
         df,
         x=x_col,
         y=y_col,
-        title=f"Scatter plot showing the relation between {y_col} vs {x_col}",
         custom_data=[df[label_col]] if label_col else None
     )
 
@@ -431,41 +437,73 @@ def plot_scatter_plot(interpretor_instance, df, x_col, y_col, point_color="blue"
             size=point_size,
             color=point_color,
             symbol=marker_symbol,
-            line=dict(width=1, color='DarkSlateGrey')
+            line=dict(width=1.5, color='white'),
+            opacity=0.9
         ),
-        mode="markers",
-        hovertemplate=hover + "<extra></extra>"
+        hovertemplate=hover + "<extra></extra>",
+        mode="markers"
     )
 
     fig.update_layout(
         title=dict(
-            text=f"<b>Scatter plot showing the relation between {x_col.capitalize()} vs {y_col.capitalize()}</b>",
-            font=dict(size=18, family="Arial", color="black"),
-            x=0.5,
-            xanchor='center'
+            text=f"<span style='font-size:26px; font-weight:600;'>{x_col.capitalize()} vs {y_col.capitalize()}</span><br>"
+                 f"<span style='font-size:18px; color:#606060'>Scatter Plot</span>",
+            x=0.03,
+            y=0.93,
+            xanchor='left',
+            yanchor='top'
         ),
         xaxis=dict(
-            title=dict(text=f"<b>{x_col.capitalize()}</b>", font=dict(size=14, family="Arial")),
-            tickangle=-45,
+            title=x_col.capitalize(),
+            tickfont=dict(size=14, color='#606060', family='Poppins'),
+            gridcolor='rgba(200, 200, 200, 0.1)',
+            linecolor='#d0d0d0',
             showgrid=True,
-            gridcolor="rgba(211, 211, 211, 0.5)",
-            zeroline=False
+            automargin=True
         ),
         yaxis=dict(
-            title=dict(text=f"<b>{y_col.capitalize()}</b>", font=dict(size=14, family="Arial")),
+            title=y_col.capitalize(),
+            gridcolor='rgba(200, 200, 200, 0.2)',
             showgrid=True,
-            gridcolor="rgba(211, 211, 211, 0.5)",
-            zeroline=False
+            zeroline=False,
+            tickfont=dict(size=12, color='#808080')
         ),
-        plot_bgcolor="white",
+        plot_bgcolor='rgba(255, 255, 255, 0.95)',
+        paper_bgcolor='#f8f9fa',
+        margin=dict(t=120, b=100, l=60, r=40),
+        font=dict(family='Poppins, Arial', color='#404040'),
         hovermode="closest",
-        margin=dict(t=70, b=100, l=60, r=30),
-        legend=dict(
-            title_text="",
-            bgcolor="rgba(255, 255, 255, 0.8)",
-            bordercolor="LightGrey",
-            borderwidth=1
-        )
+        hoverdistance=100,
+        separators=',.',
+
+    )
+
+    # Add decorative frame
+    fig.add_shape(
+        type="rect",
+        xref="paper",
+        yref="paper",
+        x0=0, y0=0,
+        x1=1, y1=1,
+        line=dict(color="#e0e0e0", width=2),
+        fillcolor="rgba(0,0,0,0)"
+    )
+
+    # Add dynamic annotation summary
+    total_points = len(df)
+    fig.add_annotation(
+        x=0.95,
+        y=0.98,
+        xref="paper",
+        yref="paper",
+        text=f"<b>Total Points:</b> {total_points:,}<br>"
+             f"<b>Marker:</b> {marker_symbol.capitalize()}",
+        showarrow=False,
+        align="right",
+        font=dict(size=12),
+        bgcolor="rgba(255,255,255,0.9)",
+        bordercolor="#d0d0d0",
+        borderwidth=1
     )
 
     json_str = pio.to_json(fig, pretty=True, remove_uids=True)
@@ -914,6 +952,87 @@ def plot_area_chart_stacked_trend(interpretor_instance, df, x_col, y_col, catego
             tickformat="%b %Y",
             hoverformat="%b %d, %Y"
         )
+
+    json_str = pio.to_json(fig, pretty=True, remove_uids=True)
+    interpretor_instance.json_list.append(json_str)
+
+
+def plot_bubble(interpretor_instance, df, x_col, y_col, size_col, category_col):
+    # Ensure valid types
+    df = df.copy()
+    df[size_col] = pd.to_numeric(df[size_col], errors='coerce').fillna(0)
+
+    # Normalize bubble sizes to enhance visual consistency
+    size_scale = 3000 * df[size_col] / df[size_col].max()
+
+    # Generate colors using seaborn's palette
+    unique_categories = df[category_col].nunique()
+    colors = sns.color_palette("viridis", unique_categories)
+    hex_colors = [matplotlib.colors.rgb2hex(c) for c in colors]
+
+    # Assign each category a color
+    color_map = dict(zip(df[category_col].unique(), hex_colors))
+    df['color'] = df[category_col].map(color_map)
+
+    # Create interactive bubble chart
+    fig = px.scatter(
+        df,
+        x=x_col,
+        y=y_col,
+        size=size_col,
+        color=category_col,
+        text=category_col,
+        size_max=60,
+        color_discrete_sequence=hex_colors,
+        hover_name=category_col,
+        hover_data={x_col: True, y_col: True, size_col: ':.0f'},
+        template='plotly_white',
+        opacity=0.85
+    )
+
+    # Update traces
+    fig.update_traces(
+        textposition='middle center',
+        textfont=dict(size=12, color='black'),
+        marker=dict(line=dict(width=1, color='white')),
+        selector=dict(mode='markers'),
+        hovertemplate=(
+            f"<b>%{{hovertext}}</b><br>"
+            f"{x_col}: %{{x}}<br>"
+            f"{y_col}: %{{y}}<br>"
+            f"{size_col}: %{{marker.size:.0f}}<extra></extra>"
+        )
+    )
+
+    # Update layout to match others
+    fig.update_layout(
+        title=dict(
+            text=f"<span style='font-size:24px; font-weight:600;'>{category_col} Bubble Chart</span><br>"
+                 f"<span style='font-size:16px; color:#606060'>Bubble size based on {size_col}</span>",
+            x=0.03,
+            y=0.95,
+            xanchor='left',
+            yanchor='top'
+        ),
+        xaxis=dict(
+            title=dict(text=x_col, font=dict(size=14, family='Arial')),
+            tickfont=dict(size=12),
+            gridcolor='rgba(220,220,220,0.3)'
+        ),
+        yaxis=dict(
+            title=dict(text=y_col, font=dict(size=14, family='Arial')),
+            tickfont=dict(size=12),
+            gridcolor='rgba(220,220,220,0.3)'
+        ),
+        plot_bgcolor='white',
+        paper_bgcolor='#f8f9fa',
+        legend=dict(
+            title=dict(text=category_col),
+            font=dict(size=12)
+        ),
+        margin=dict(t=100, b=80, l=60, r=40),
+        font=dict(family='Poppins, Arial', color='#404040'),
+    )
 
     json_str = pio.to_json(fig, pretty=True, remove_uids=True)
     interpretor_instance.json_list.append(json_str)

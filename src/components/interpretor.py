@@ -62,10 +62,15 @@ class Interpretor(ParseTreeVisitor):
                     command_type = 'ACCUMULATION'
                 elif token_type == ChartLexer.STACKED_TREND:
                     command_type = 'STACKED_TREND'
+                elif token_type == ChartLexer.BUBBLE:
+                    command_type = 'BUBBLE'
                 break  # Assume first terminal defines the command
         x_col, y_col = None, None
         group_col = None
         step = None
+
+        bubble_size = None
+        bubble_data = None
 
         # Extract parameters based on command type
         if command_type == 'COMPARE':
@@ -150,12 +155,27 @@ class Interpretor(ParseTreeVisitor):
                     x_col = child.getText()
                 if isinstance(child, ChartParser.ValueContext):
                     step = child.getText()
-
+        elif command_type == 'BUBBLE':
+            columns_list = []
+            for child in chart_func_ctx.getChildren():
+                if isinstance(child, ChartParser.VarContext):
+                    columns_list.append(child.getText())
+                elif isinstance(child, ChartParser.CasesContext):
+                    bubble_data = child.getText()
+            x_col = columns_list[0]
+            y_col = columns_list[1]
+            bubble_size = columns_list[2]
 
         df.columns = df.columns.str.strip().str.lower()
+        if x_col:
+            x_col = x_col.lower()
+        if y_col:
+            y_col = y_col.lower()
+
         if x_col not in df.columns or (y_col and y_col not in df.columns) or (group_col and group_col not in df.columns):
             print(f"Error: One or more columns ({x_col, y_col}) not found not found in dataset '{dataset}'.")
             return
+
 
         if command_type == 'COMPARE' or command_type == 'DIFFERENCES':
             if group_col:
@@ -179,4 +199,5 @@ class Interpretor(ParseTreeVisitor):
             plot_area_chart_stacked_trend(self, df, x_col, y_col, categories_column)
         elif command_type == 'FREQUENCY':
             plot_histogram(self, df, x_col, step)
-        return
+        elif command_type == 'BUBBLE':
+            plot_bubble(self, df, x_col, y_col, bubble_size, bubble_data)
