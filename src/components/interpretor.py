@@ -1,6 +1,6 @@
 import pandas as pd
 from components.reader import *
-from components.plotter2 import *
+from components.plotter import *
 import sys, os
 
 from antlr4 import *
