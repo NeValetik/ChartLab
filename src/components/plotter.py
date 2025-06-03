@@ -6,7 +6,7 @@ import matplotlib
 import plotly.io as pio
 from matplotlib import pyplot as plt
 
-def plot_comparison(interpretor_instance, df, value_col, category_col):
+def plot_comparison(df, value_col, category_col):
     # Sort and aggregate data
     grouped_data = df.groupby(category_col)[value_col].sum().sort_values(ascending=False).reset_index()
 
@@ -51,10 +51,9 @@ def plot_comparison(interpretor_instance, df, value_col, category_col):
         margin=dict(t=60, b=100)
     )
 
-    json_str = pio.to_json(fig, pretty=True, remove_uids=True)
-    interpretor_instance.json_list.append(json_str)
+    return pio.to_json(fig, pretty=True, remove_uids=True)
 
-def plot_comaprison_daniela_version(interpretor_instance, df, value_col, category_col):
+def plot_comaprison_daniela_version(df, value_col, category_col):
     # Sort and aggregate data
     grouped_data = df.groupby(category_col)[value_col].sum().sort_values(ascending=False).reset_index()
     
@@ -186,10 +185,9 @@ def plot_comaprison_daniela_version(interpretor_instance, df, value_col, categor
         borderwidth=1
     )
 
-    json_str = pio.to_json(fig, pretty=True, remove_uids=True)
-    interpretor_instance.json_list.append(json_str)
+    return pio.to_json(fig, pretty=True, remove_uids=True)
 
-def plot_line_graph(interpretor_instance, df, x_col, y_col):
+def plot_line_graph(df, x_col, y_col):
     # Convert to datetime
     df[y_col] = pd.to_datetime(df[y_col])
 
@@ -236,10 +234,9 @@ def plot_line_graph(interpretor_instance, df, x_col, y_col):
         )
     )
 
-    json_str = pio.to_json(fig, pretty=True, remove_uids=True)
-    interpretor_instance.json_list.append(json_str)
+    return pio.to_json(fig, pretty=True, remove_uids=True)
 
-def plot_grouped_bar_chart(interpretor_instance, df, y_col, x_col, group_col):
+def plot_grouped_bar_chart(df, y_col, x_col, group_col):
     # Aggregate data
     grouped_data = df.groupby([x_col, group_col])[y_col].sum().reset_index()
 
@@ -312,10 +309,9 @@ def plot_grouped_bar_chart(interpretor_instance, df, y_col, x_col, group_col):
         )
     )
 
-    json_str = pio.to_json(fig, pretty=True, remove_uids=True)
-    interpretor_instance.json_list.append(json_str)
+    return pio.to_json(fig, pretty=True, remove_uids=True)
 
-def plot_stacked_bar_chart(interpretor_instance, df, y_col, x_col, group_col):
+def plot_stacked_bar_chart(df, y_col, x_col, group_col):
     # Aggregate the data
     grouped_data = df.groupby([x_col, group_col])[y_col].sum().reset_index()
 
@@ -402,10 +398,9 @@ def plot_stacked_bar_chart(interpretor_instance, df, y_col, x_col, group_col):
         borderwidth=1
     )
 
-    json_str = pio.to_json(fig, pretty=True, remove_uids=True)
-    interpretor_instance.json_list.append(json_str)
+    return pio.to_json(fig, pretty=True, remove_uids=True)
 
-def plot_scatter_plot(interpretor_instance, df, x_col, y_col, point_size=15, marker_symbol="circle", label_col=None):
+def plot_scatter_plot(df, x_col, y_col, point_size=15, marker_symbol="circle", label_col=None):
     if x_col not in df.columns or y_col not in df.columns:
         raise ValueError(f"Columns '{x_col}' or '{y_col}' not found in DataFrame.")
 
@@ -506,10 +501,9 @@ def plot_scatter_plot(interpretor_instance, df, x_col, y_col, point_size=15, mar
         borderwidth=1
     )
 
-    json_str = pio.to_json(fig, pretty=True, remove_uids=True)
-    interpretor_instance.json_list.append(json_str)
+    return pio.to_json(fig, pretty=True, remove_uids=True)
 
-def plot_pie_chart(interpretor_instance, df, x_col, y_col):
+def plot_pie_chart(df, x_col, y_col):
     # Convert y_col to numeric if it's not already
     if not pd.api.types.is_numeric_dtype(df[y_col]):
         # Clean and convert numeric values
@@ -600,10 +594,9 @@ def plot_pie_chart(interpretor_instance, df, x_col, y_col):
         ),
     )
 
-    json_str = pio.to_json(fig, pretty=True, remove_uids=True)
-    interpretor_instance.json_list.append(json_str)
+    return pio.to_json(fig, pretty=True, remove_uids=True)
 
-def plot_area_chart_accumulation(interpretor_instance, df, x_col, y_col, categories_column):
+def plot_area_chart_accumulation(df, x_col, y_col, categories_column):
     # Convert year to proper integer type (critical fix)
     df[x_col] = df[x_col].astype(int)
 
@@ -730,11 +723,10 @@ def plot_area_chart_accumulation(interpretor_instance, df, x_col, y_col, categor
         ]
     )
 
-    json_str = pio.to_json(fig, pretty=True, remove_uids=True)
-    interpretor_instance.json_list.append(json_str)
+    return pio.to_json(fig, pretty=True, remove_uids=True)
 
 
-def plot_histogram(interpretor_instance, df, column, step):
+def plot_histogram(df, column, step):
     # Ensure numeric data
     df[column] = pd.to_numeric(df[column], errors='coerce')
 
@@ -821,10 +813,9 @@ def plot_histogram(interpretor_instance, df, column, step):
         ]
     )
 
-    json_str = pio.to_json(fig, pretty=True, remove_uids=True)
-    interpretor_instance.json_list.append(json_str)
+    return pio.to_json(fig, pretty=True, remove_uids=True)
 
-def plot_area_chart_stacked_trend(interpretor_instance, df, x_col, y_col, categories_column):
+def plot_area_chart_stacked_trend(df, x_col, y_col, categories_column):
     # Convert x_col to proper type (datetime if possible)
     try:
         df[x_col] = pd.to_datetime(df[x_col])
@@ -953,11 +944,10 @@ def plot_area_chart_stacked_trend(interpretor_instance, df, x_col, y_col, catego
             hoverformat="%b %d, %Y"
         )
 
-    json_str = pio.to_json(fig, pretty=True, remove_uids=True)
-    interpretor_instance.json_list.append(json_str)
+    return pio.to_json(fig, pretty=True, remove_uids=True)
 
 
-def plot_bubble(interpretor_instance, df, x_col, y_col, size_col, category_col):
+def plot_bubble(df, x_col, y_col, size_col, category_col):
     # Ensure valid types
     df = df.copy()
     df[size_col] = pd.to_numeric(df[size_col], errors='coerce').fillna(0)
@@ -1034,5 +1024,4 @@ def plot_bubble(interpretor_instance, df, x_col, y_col, size_col, category_col):
         font=dict(family='Poppins, Arial', color='#404040'),
     )
 
-    json_str = pio.to_json(fig, pretty=True, remove_uids=True)
-    interpretor_instance.json_list.append(json_str)
+    return pio.to_json(fig, pretty=True, remove_uids=True)
