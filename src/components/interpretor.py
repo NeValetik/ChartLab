@@ -198,9 +198,7 @@ class Interpretor(ParseTreeVisitor):
         elif command_type == 'SCATTER':
             self.json_list.append(plot_scatter_plot(df, x_col, y_col))
         elif command_type == 'PROPORTION':
-            test = plot_pie_chart(df, x_col, y_col)
-            print(test)
-            self.json_list.append(test)
+            self.json_list.append(plot_pie_chart(df, x_col, y_col))
         elif command_type == 'ACCUMULATION':
             self.json_list.append(plot_area_chart_accumulation(df, x_col, y_col, categories_column))
         elif command_type == 'STACKED_TREND':

@@ -14,7 +14,6 @@ def generate_image():
     if json_list is None:
         return jsonify("Internal Error: No json_list was returned.", 400)
 
-    print(json_list)
     return jsonify({"plots": json_list})
 
 @app.route('/api/v1/files', methods=['GET'])

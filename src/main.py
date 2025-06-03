@@ -10,7 +10,7 @@ def create_chart(content):
     token_stream = CommonTokenStream(lexer)
 
     parser = ChartParser(token_stream)
-    tree = parser.command()
+    tree = parser.program()
 
     interpretor = Interpretor()
     json_list = interpretor.walk_tree(tree)
