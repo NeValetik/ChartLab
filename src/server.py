@@ -1,6 +1,10 @@
 from flask import Flask, request, jsonify
-from main import create_chart
 import os
+
+from antlr4 import *
+from antlr.ChartLexer import ChartLexer
+from antlr.ChartParser import ChartParser
+from components.interpretor import *
 
 app = Flask(__name__)
 
@@ -52,6 +56,19 @@ def save_data():
         file.write(content["code"])
 
     return jsonify({"message": "Input data saved successfully"}), 201
+
+def create_chart(content):
+    input_stream = InputStream(content)
+
+    lexer = ChartLexer(input_stream)
+    token_stream = CommonTokenStream(lexer)
+
+    parser = ChartParser(token_stream)
+    tree = parser.program()
+
+    interpretor = Interpretor()
+    json_list = interpretor.walk_tree(tree)
+    return json_list
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)

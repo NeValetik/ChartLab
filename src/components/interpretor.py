@@ -5,8 +5,8 @@ import sys, os
 
 from antlr4 import *
 
-from antlr2.ChartLexer import ChartLexer
-from antlr2.ChartParser import ChartParser
+from antlr.ChartLexer import ChartLexer
+from antlr.ChartParser import ChartParser
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
