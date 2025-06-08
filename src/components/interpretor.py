@@ -185,25 +185,25 @@ class Interpretor(ParseTreeVisitor):
 
         if command_type == 'COMPARE' or command_type == 'DIFFERENCES':
             if group_col:
-                self.json_list.append(plot_grouped_bar_chart(df, y_col, x_col, group_col))
+                self.json_list.append(get_grouped_bar_chart(df, y_col, x_col, group_col))
             else:
-                self.json_list.append(plot_comaprison_daniela_version(df, y_col, x_col))
+                self.json_list.append(get_comaprison(df, y_col, x_col))
         elif command_type == 'CORRELATION':
-            self.json_list.append(plot_line_graph(df, x_col, y_col))
+            self.json_list.append(get_line_graph(df, x_col, y_col))
         elif command_type == 'SHOW':
             if group_col:
-                self.json_list.append(plot_stacked_bar_chart(df, y_col, x_col, group_col))
+                self.json_list.append(get_stacked_bar_chart(df, y_col, x_col, group_col))
             else:
                 pass
         elif command_type == 'SCATTER':
-            self.json_list.append(plot_scatter_plot(df, x_col, y_col))
+            self.json_list.append(get_scatter_plot(df, x_col, y_col))
         elif command_type == 'PROPORTION':
-            self.json_list.append(plot_pie_chart(df, x_col, y_col))
+            self.json_list.append(get_pie_chart(df, x_col, y_col))
         elif command_type == 'ACCUMULATION':
-            self.json_list.append(plot_area_chart_accumulation(df, x_col, y_col, categories_column))
+            self.json_list.append(get_area_chart_accumulation(df, x_col, y_col, categories_column))
         elif command_type == 'STACKED_TREND':
-            self.json_list.append(plot_area_chart_stacked_trend(df, x_col, y_col, categories_column))
+            self.json_list.append(get_area_chart_stacked_trend(df, x_col, y_col, categories_column))
         elif command_type == 'FREQUENCY':
-            self.json_list.append(plot_histogram(df, x_col, step))
+            self.json_list.append(get_histogram(df, x_col, step))
         elif command_type == 'BUBBLE':
-            self.json_list.append(plot_bubble(df, x_col, y_col, bubble_size, bubble_data))
+            self.json_list.append(get_bubble(df, x_col, y_col, bubble_size, bubble_data))
