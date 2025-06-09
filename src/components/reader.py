@@ -2,59 +2,68 @@ import pandas as pd
 import os
 
 class Reader:
-    @classmethod
+    def _get_full_path(cls, path):
+        base_directory = os.path.join(os.path.dirname(__file__), '..', 'data', 'statistic_data')
+        full_path = os.path.join(base_directory, path)
+        return os.path.abspath(full_path)
+
     def read(cls, path):
-        # Determines the file type and calls the appropriate read method.
         _, ext = os.path.splitext(path)
-        if ext.lower() == '.csv':
+        ext = ext.lower()
+        
+        if ext == '.csv':
             return cls.read_csv(path)
-        elif ext.lower() == '.xlsx':
+        elif ext == '.xlsx':
             return cls.read_xlsx(path)
+        elif ext == '.json':
+            return cls.read_json(path)
+        elif ext == '.xml':
+            return cls.read_xml(path)
         else:
             return cls.read_other(path)
     
-    @classmethod
     def read_csv(cls, path):
         try:
-            # Generating abosolute path to the files
-            base_directory = os.path.join(os.path.dirname(__file__), '..', 'data', 'statistic_data')
-            full_path = os.path.join(base_directory, path)
-            full_path = os.path.abspath(full_path)  # Convert to absolute path
+            full_path = cls._get_full_path(path)
             print(full_path)
             return pd.read_csv(full_path)
         except Exception as e:
-            print(f"Error reading CSV file: {e}")
+            print(f"Error reading CSV file: {str(e)}")
             return None
-    
-    @classmethod
+
     def read_xlsx(cls, path):
         try:
-            # Generate absolute path using same base directory as CSV
-            base_directory = os.path.join(os.path.dirname(__file__), '..', 'data', 'statistic_data')
-            full_path = os.path.join(base_directory, path)
-            full_path = os.path.abspath(full_path)
+            full_path = cls._get_full_path(path)
             print(f"Loading Excel file from: {full_path}")
-            
-            # Read Excel with type consistency safeguards
             return pd.read_excel(
                 full_path,
-                engine='openpyxl',  # Required for xlsx format
-                dtype={'ID': str},  # Preserve leading zeros
-                parse_dates=True,   # Auto-detect date columns
+                engine='openpyxl',
+                dtype={'ID': str},
+                parse_dates=True,
                 keep_default_na=False
             )
-        except FileNotFoundError:
-            print(f"Excel file not found: {full_path}")
-            return None
-        except PermissionError:
-            print(f"Permission denied for Excel file: {full_path}")
-            return None
         except Exception as e:
             print(f"Error reading Excel file: {str(e)}")
             return None
 
-    @classmethod
+    def read_json(cls, path):
+        try:
+            full_path = cls._get_full_path(path)
+            print(f"Loading JSON file from: {full_path}")
+            return pd.read_json(full_path)
+        except Exception as e:
+            print(f"Error reading JSON file: {str(e)}")
+            return None
+
+    def read_xml(cls, path):
+        try:
+            full_path = cls._get_full_path(path)
+            print(f"Loading XML file from: {full_path}")
+            return pd.read_xml(full_path)
+        except Exception as e:
+            print(f"Error reading XML file: {str(e)}")
+            return None
+
     def read_other(cls, path):
         print(f"Unsupported file type for: {path}")
-        return []
-    
+        return None

@@ -43,7 +43,7 @@ class Interpretor(ParseTreeVisitor):
             return
 
         # Read dataset and validate columns
-        df = Reader.read(f"{dataset}.csv")
+        df = Reader().read(f"{dataset}.csv")
 
         # Determine the type of chart function
         command_type = None
