@@ -200,9 +200,9 @@ class Interpretor(ParseTreeVisitor):
         elif command_type == 'PROPORTION':
             self.json_list.append(get_pie_chart(df, x_col, y_col))
         elif command_type == 'ACCUMULATION':
-            self.json_list.append(get_area_chart_accumulation(df, x_col, y_col, categories_column))
+            self.json_list.append(get_area_chart(df, x_col, y_col, categories_column))
         elif command_type == 'STACKED_TREND':
-            self.json_list.append(get_area_chart_stacked_trend(df, x_col, y_col, categories_column))
+            self.json_list.append(get_area_chart(df, x_col, y_col, categories_column))
         elif command_type == 'FREQUENCY':
             self.json_list.append(get_histogram(df, x_col, step))
         elif command_type == 'BUBBLE':

@@ -596,131 +596,56 @@ def get_pie_chart(df, x_col, y_col):
 
     return pio.to_json(fig, pretty=True, remove_uids=True)
 
-def get_area_chart_accumulation(df, x_col, y_col, categories_column):
-    # Convert year to proper integer type (critical fix)
-    df[x_col] = df[x_col].astype(int)
-
-    # Ensure all category-year combinations exist (even with 0 values)
-    pivot_data = df.pivot_table(
-        index=x_col,
-        columns=categories_column,
-        values=y_col,
-        aggfunc='sum',
-        fill_value=0
-    ).reset_index().melt(
-        id_vars=x_col,
-        value_name=y_col,
-        var_name=categories_column
-    )
-
-    # Calculate totals and percentages
-    total_per_x = pivot_data.groupby(x_col)[y_col].sum().reset_index(name='total')
-    grouped_data = pivot_data.merge(total_per_x, on=x_col)
-    grouped_data['percentage'] = grouped_data[y_col] / grouped_data['total']
-
-    # Force categorical sorting for years
-    grouped_data = grouped_data.sort_values(by=x_col)
-
-    # Generate color palette
-    category_order = grouped_data.groupby(categories_column)[y_col].sum().sort_values(ascending=False).index.tolist()
-    colors = sns.color_palette("viridis", len(category_order))
-    hex_colors = [matplotlib.colors.rgb2hex(c) for c in colors]
-
-    # Create area chart with explicit category treatment
-    fig = px.area(
-        grouped_data,
-        x=x_col,
-        y=y_col,
-        color=categories_column,
-        category_orders={categories_column: category_order},
-        color_discrete_sequence=hex_colors,
-        line_shape='linear',  # Explicitly disable curve
-        hover_data={
-            'total': ':.0f',
-            'percentage': ':.1%',
-            x_col: False
-        },
-    )
-
-    # Fix x-axis formatting
-    fig.update_xaxes(
-        type='category',  # Treat years as discrete categories
-        tickvals=grouped_data[x_col].unique(),
-        ticktext=[str(int(year)) for year in grouped_data[x_col].unique()]
-    )
+def get_area_chart(df, x_column, y_column, color_column, chart_title="Area Chart"):
+    required_columns = [x_column, y_column, color_column]
+    missing_columns = [col for col in required_columns if col not in df.columns]
     
-    # Customize hover template
-    fig.update_traces(
-        hovertemplate=(
-            "<b>%{x}</b><br>"
-            "<b>%{fullData.name}</b><br>"
-            "Value: %{y:,.0f}<br>"
-            "Total: %{total:,.0f}<br>"
-            "Percentage: %{percentage:.1%}<extra></extra>"
-        ),
-        line=dict(width=0.5, color='white')
-    )
+    if missing_columns:
+        print(f"Error: The following columns are missing from the data: {missing_columns}")
+        print(f"Available columns: {list(df.columns)}")
+        return
     
-    # Calculate total sum for annotation
-    total_sum = grouped_data[y_col].sum()
-    
-    # Customize layout
-    title_text = (
-        f"<span style='font-size:24px; font-weight:600;'>Accumulation of {y_col} by {categories_column}</span><br>"
-        f"<span style='font-size:18px; color:#606060'>Over {x_col}</span>"
-    )
+    fig = px.area(df, 
+                  x=x_column, 
+                  y=y_column, 
+                  color=color_column,
+                  title=chart_title,
+                  labels={
+                      y_column: f'{y_column.title()} ($)',
+                      x_column: x_column.title(),
+                      color_column: color_column.title()
+                  })
     
     fig.update_layout(
-        title=dict(
-            text=title_text,
-            x=0.03,
-            y=0.95,
-            xanchor='left',
-            yanchor='top'
-        ),
-        xaxis=dict(
-            title=None,
-            tickfont=dict(size=12, color='#606060', family='Poppins'),
-            gridcolor='rgba(200, 200, 200, 0.2)',
-            linecolor='#d0d0d0',
-            showgrid=False,
-            automargin=True
-        ),
-        yaxis=dict(
-            title=None,
-            gridcolor='rgba(200, 200, 200, 0.2)',
-            showgrid=True,
-            zeroline=False,
-            tickformat=',.0f',
-            tickfont=dict(size=12, color='#808080')
-        ),
-        plot_bgcolor='white',
-        paper_bgcolor='#f8f9fa',
-        margin=dict(t=120, b=100, l=60, r=40),
-        font=dict(family='Poppins, Arial', color='#404040'),
+        title={
+            'text': chart_title,
+            'x': 0.5,
+            'xanchor': 'center',
+            'font': {'size': 20}
+        },
+        xaxis_title=x_column.title(),
+        yaxis_title=f'{y_column.title()} ($)',
+        font=dict(size=12),
+        hovermode='x unified',
+        width=1000,
+        height=600,
+        showlegend=True,
         legend=dict(
-            title=dict(text=categories_column, font=dict(size=12)),
-            orientation='h',
-            yanchor='bottom',
-            y=-0.3,
-            xanchor='center',
-            x=0.5
-        ),
-        annotations=[
-            dict(
-                x=0.95,
-                y=0.98,
-                xref="paper",
-                yref="paper",
-                text=f"<b>Total {y_col}:</b> {total_sum:,.0f}",
-                showarrow=False,
-                align="right",
-                font=dict(size=12),
-                bgcolor="rgba(255,255,255,0.9)",
-                bordercolor="#d0d0d0",
-                borderwidth=1
-            )
-        ]
+            orientation="v",
+            yanchor="top",
+            y=0.99,
+            xanchor="left",
+            x=0.01
+        )
+    )
+    
+    fig.update_yaxes(tickformat='$,.0f')
+    
+    fig.update_traces(
+        hovertemplate=f'<b>%{{fullData.name}}</b><br>' +
+                     f'{x_column.title()}: %{{x}}<br>' +
+                     f'{y_column.title()}: $%{{y:,.0f}}<br>' +
+                     '<extra></extra>'
     )
 
     return pio.to_json(fig, pretty=True, remove_uids=True)
@@ -814,138 +739,6 @@ def get_histogram(df, column, step):
     )
 
     return pio.to_json(fig, pretty=True, remove_uids=True)
-
-def get_area_chart_stacked_trend(df, x_col, y_col, categories_column):
-    # Convert x_col to proper type (datetime if possible)
-    try:
-        df[x_col] = pd.to_datetime(df[x_col])
-    except Exception:
-        pass
-
-    # Ensure all category-x combinations exist (fill missing with 0)
-    pivot_data = df.pivot_table(
-        index=x_col,
-        columns=categories_column,
-        values=y_col,
-        aggfunc='sum',
-        fill_value=0
-    ).reset_index().melt(
-        id_vars=x_col,
-        value_name=y_col,
-        var_name=categories_column
-    )
-
-    # Calculate total for each x value and percentage contributions
-    total_per_x = pivot_data.groupby(x_col)[y_col].sum().reset_index(name='total')
-    grouped_data = pivot_data.merge(total_per_x, on=x_col)
-    grouped_data['percentage'] = grouped_data[y_col] / grouped_data['total']
-
-    # Generate color palette based on sorted categories
-    category_order = grouped_data.groupby(categories_column)[y_col].sum().sort_values(ascending=False).index.tolist()
-    colors = sns.color_palette("viridis", len(category_order))
-    hex_colors = [matplotlib.colors.rgb2hex(c) for c in colors]
-
-    # Create stacked area chart with enhanced interactivity
-    fig = px.area(
-        grouped_data,
-        x=x_col,
-        y=y_col,
-        color=categories_column,
-        category_orders={categories_column: category_order},
-        color_discrete_sequence=hex_colors,
-        line_shape='linear',
-        hover_data={
-            'total': ':.0f',
-            'percentage': ':.1%',
-            x_col: False,
-            categories_column: True
-        },
-        labels={y_col: f'<b>{y_col}</b>'},
-    )
-
-    # Customize hover template
-    fig.update_traces(
-        hovertemplate=(
-            "<b>%{x}</b><br>"
-            "<b>%{fullData.name}</b><br>"
-            "Value: %{y:,.0f}<br>"
-            "Total: %{total:,.0f}<br>"
-            "Contribution: %{percentage:.1%}<extra></extra>"
-        ),
-        line=dict(width=0.5, color='white')
-    )
-
-    # Calculate total sum for annotation
-    total_sum = grouped_data[y_col].sum()
-    
-    # Professional layout configuration
-    title_text = (
-        f"<span style='font-size:24px; font-weight:600;'>Stacked Trend of {y_col} by {categories_column}</span><br>"
-        f"<span style='font-size:18px; color:#606060'>Over {x_col}</span>"
-    )
-    
-    fig.update_layout(
-        title=dict(
-            text=title_text,
-            x=0.03,
-            y=0.95,
-            xanchor='left',
-            yanchor='top'
-        ),
-        xaxis=dict(
-            title=None,
-            tickfont=dict(size=12, color='#606060', family='Poppins'),
-            gridcolor='rgba(200, 200, 200, 0.2)',
-            linecolor='#d0d0d0',
-            showgrid=False,
-            automargin=True
-        ),
-        yaxis=dict(
-            title=None,
-            gridcolor='rgba(200, 200, 200, 0.2)',
-            showgrid=True,
-            zeroline=False,
-            tickformat=',.0f',
-            tickfont=dict(size=12, color='#808080')
-        ),
-        plot_bgcolor='white',
-        paper_bgcolor='#f8f9fa',
-        margin=dict(t=120, b=100, l=60, r=40),
-        font=dict(family='Poppins, Arial', color='#404040'),
-        legend=dict(
-            title=dict(text=categories_column, font=dict(size=12)),
-            orientation='h',
-            yanchor='bottom',
-            y=-0.3,
-            xanchor='center',
-            x=0.5
-        ),
-        annotations=[
-            dict(
-                x=0.95,
-                y=0.98,
-                xref="paper",
-                yref="paper",
-                text=f"<b>Total {y_col}:</b> {total_sum:,.0f}",
-                showarrow=False,
-                align="right",
-                font=dict(size=12),
-                bgcolor="rgba(255,255,255,0.9)",
-                bordercolor="#d0d0d0",
-                borderwidth=1
-            )
-        ]
-    )
-
-    # Handle datetime formatting if x-axis is dates
-    if pd.api.types.is_datetime64_any_dtype(grouped_data[x_col]):
-        fig.update_xaxes(
-            tickformat="%b %Y",
-            hoverformat="%b %d, %Y"
-        )
-
-    return pio.to_json(fig, pretty=True, remove_uids=True)
-
 
 def get_bubble(df, x_col, y_col, size_col, category_col):
     # Ensure valid types
