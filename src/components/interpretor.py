@@ -146,9 +146,9 @@ class Interpretor(ParseTreeVisitor):
                     columns_list = []
                     for child in chart_func_ctx.getChildren():
                         if isinstance(child, ChartParser.VarContext):
-                            columns_list.append(child.getText())
+                            columns_list.append(child.getText().lower())
                         elif isinstance(child, ChartParser.CasesContext):
-                            bubble_data = child.getText()
+                            bubble_data = child.getText().lower()
                     x_col = columns_list[0]
                     y_col = columns_list[1]
                     bubble_size = columns_list[2]
