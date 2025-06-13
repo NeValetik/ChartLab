@@ -272,15 +272,17 @@ def get_grouped_bar_chart(df, y_col, x_col, group_col):
         )
     )
 
-    main_title = f"{y_col.title()} by {x_col.title()} <span style='font-size:17px; color:#888;'>grouped by {group_col.title()}</span>"
+    main_title = f"<span style='font-size:24px; font-weight:600'>{y_col.title()} by {x_col.title()} </span><br><span style='font-size:18px; color:#606060'>Grouped by {group_col.title()}</span>"
+
 
     # Update layout with styling
     fig.update_layout(
         title=dict(
-            text=f"<b>{main_title}</b>",
+            text=f"{main_title}",
             x=0.03,
             y=0.93,
-            xanchor='left'
+            xanchor='left',
+            yanchor='top'
         ),
         xaxis=dict(
             title=None,
@@ -319,7 +321,9 @@ def get_stacked_bar_chart(df, y_col, x_col, group_col):
 
     # Determine color palette
     unique_stacks = grouped_data[group_col].nunique()
-    colors = sns.color_palette("rocket", unique_stacks)
+    colors = sns.color_palette("PuRd", unique_stacks)
+    colors = [sns.desaturate(c, 0.5) for c in colors]  # make colors softer
+    colors = [(min(1, r + 0.15), min(1, g + 0.15), min(1, b + 0.15)) for (r, g, b) in colors]  # brighten
     hex_colors = [matplotlib.colors.rgb2hex(c) for c in colors]
 
     # Create the stacked bar chart
@@ -348,8 +352,8 @@ def get_stacked_bar_chart(df, y_col, x_col, group_col):
     # Configure layout
     fig.update_layout(
         title=dict(
-            text=f"<span style='font-size:24px; font-weight:600;'>Stacked {y_col} by {group_col}</span><br>"
-                 f"<span style='font-size:18px; color:#606060'>Grouped by {x_col}</span>",
+            text=f"<span style='font-size:24px; font-weight:600;'>{y_col.title()} by {x_col.title()}</span><br>"
+                 f"<span style='font-size:18px; color:#606060'>Stacked by {group_col.title()}</span>",
             x=0.03,
             y=0.95,
             xanchor='left',
@@ -372,12 +376,15 @@ def get_stacked_bar_chart(df, y_col, x_col, group_col):
         margin=dict(t=100, b=100, l=60, r=40),
         font=dict(family='Poppins, Arial', color='#404040'),
         legend=dict(
-            title=dict(text=group_col, font=dict(size=13)),
-            orientation='h',
-            yanchor='bottom',
-            y=-0.25,
-            xanchor='center',
-            x=0.5,
+            title=dict(text=group_col.title(), font=dict(size=13)),
+            bgcolor='rgba(255,255,255,0.8)',
+            bordercolor='#e0e0e0',
+            borderwidth=1,
+            orientation='v',
+            yanchor='middle',
+            y=0.5,
+            xanchor='left',
+            x=1.02,
             font=dict(size=12)
         )
     )
