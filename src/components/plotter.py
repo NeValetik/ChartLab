@@ -243,6 +243,7 @@ def get_grouped_bar_chart(df, y_col, x_col, group_col):
     # Generate color palette
     unique_groups = grouped_data[group_col].nunique()
     colors = sns.color_palette("mako", unique_groups)
+    colors = [sns.desaturate(c, 0.6) for c in colors]
     hex_colors = [matplotlib.colors.rgb2hex(c) for c in colors]
 
     # Create grouped bar chart
@@ -261,16 +262,17 @@ def get_grouped_bar_chart(df, y_col, x_col, group_col):
     # Customize text position and formatting
     fig.update_traces(
         texttemplate='<b>%{text:,.0f}</b>',
-        textposition='outside',
+        textposition='auto',
+        insidetextanchor='middle',
         marker=dict(opacity=0.85),
         hovertemplate=(
             f"<b>%{{x}}</b><br>"
-            f"<b>{group_col}:</b> %{{customdata[0]}}<br>"  
-            f"<b>{y_col}:</b> %{{y:,.0f}}<extra></extra>"
+            f"<b>{group_col.title()}:</b> %{{customdata[0]}}<br>"  
+            f"<b>{y_col.title()}:</b> %{{y:,.0f}}<extra></extra>"
         )
     )
 
-    main_title = f"{y_col.title()} by {x_col.title()} <span style='font-size:15px; color:#888;'>grouped by {group_col.title()}</span>"
+    main_title = f"{y_col.title()} by {x_col.title()} <span style='font-size:17px; color:#888;'>grouped by {group_col.title()}</span>"
 
     # Update layout with styling
     fig.update_layout(
@@ -297,15 +299,15 @@ def get_grouped_bar_chart(df, y_col, x_col, group_col):
         bargap=0.15,
         font=dict(family='Poppins, Arial', color='#303030'),
         legend=dict(
-            title_text=group_col,
+            title_text=group_col.title(),
             bgcolor='rgba(255,255,255,0.8)',
             bordercolor='#e0e0e0',
             borderwidth=1,
-            orientation='h',
-            yanchor='bottom',
-            y=1.02,
-            xanchor='center',
-            x=0.5
+            orientation='v',
+            yanchor='middle',
+            y=0.5,
+            xanchor='left',
+            x=1.02
         )
     )
 
