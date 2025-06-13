@@ -56,8 +56,10 @@ class Interpretor(ParseTreeVisitor):
                         elif isinstance(child, ChartParser.SubgroupContext):
                             group_col = child.getText()
                     self.check_and_normalize_data(df, dataset, x_col, y_col, group_col)
-                    self.json_list.append(get_comaprison(df, y_col, x_col))
-                
+                    if group_col:
+                        self.json_list.append(get_grouped_bar_chart(df, y_col, x_col, group_col))
+                    else:
+                        self.json_list.append(get_comaprison(df, y_col, x_col))
                 elif token_type == ChartLexer.DIFFERENCES:  # Grouped bar chart
                     # Sa presupunem ca acest tip de comanda pt BAR CHART GROUPED/SPLIT merge doar cand tabelul are 3 coloane
                     # daca tabelul are mai multe, va aleg pe prima numerica. pe viitor rezolvam.
