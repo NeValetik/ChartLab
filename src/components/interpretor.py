@@ -41,7 +41,7 @@ class Interpretor(ParseTreeVisitor):
             print("Error: Incomplete command - missing dataset or chart function.")
             return
 
-        df = Reader().read(f"{dataset}.csv")
+        df = Reader().read(dataset)
 
         for child in chart_func_ctx.getChildren():
             if isinstance(child, TerminalNode):

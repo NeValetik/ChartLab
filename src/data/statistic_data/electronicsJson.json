@@ -1,0 +1,122 @@
+[
+  {
+    "year": 2019,
+    "revenue": 120000,
+    "productcategory": "Electronics"
+  },
+  {
+    "year": 2019,
+    "revenue": 85000,
+    "productcategory": "Clothing"
+  },
+  {
+    "year": 2019,
+    "revenue": 65000,
+    "productcategory": "Home & Garden"
+  },
+  {
+    "year": 2019,
+    "revenue": 45000,
+    "productcategory": "Sports"
+  },
+  {
+    "year": 2020,
+    "revenue": 142000,
+    "productcategory": "Electronics"
+  },
+  {
+    "year": 2020,
+    "revenue": 78000,
+    "productcategory": "Clothing"
+  },
+  {
+    "year": 2020,
+    "revenue": 52000,
+    "productcategory": "Home & Garden"
+  },
+  {
+    "year": 2020,
+    "revenue": 61000,
+    "productcategory": "Sports"
+  },
+  {
+    "year": 2021,
+    "revenue": 168000,
+    "productcategory": "Electronics"
+  },
+  {
+    "year": 2021,
+    "revenue": 95000,
+    "productcategory": "Clothing"
+  },
+  {
+    "year": 2021,
+    "revenue": 48000,
+    "productcategory": "Home & Garden"
+  },
+  {
+    "year": 2021,
+    "revenue": 82000,
+    "productcategory": "Sports"
+  },
+  {
+    "year": 2022,
+    "revenue": 155000,
+    "productcategory": "Electronics"
+  },
+  {
+    "year": 2022,
+    "revenue": 138000,
+    "productcategory": "Clothing"
+  },
+  {
+    "year": 2022,
+    "revenue": 73000,
+    "productcategory": "Home & Garden"
+  },
+  {
+    "year": 2022,
+    "revenue": 94000,
+    "productcategory": "Sports"
+  },
+  {
+    "year": 2023,
+    "revenue": 189000,
+    "productcategory": "Electronics"
+  },
+  {
+    "year": 2023,
+    "revenue": 156000,
+    "productcategory": "Clothing"
+  },
+  {
+    "year": 2023,
+    "revenue": 125000,
+    "productcategory": "Home & Garden"
+  },
+  {
+    "year": 2023,
+    "revenue": 67000,
+    "productcategory": "Sports"
+  },
+  {
+    "year": 2024,
+    "revenue": 205000,
+    "productcategory": "Electronics"
+  },
+  {
+    "year": 2024,
+    "revenue": 143000,
+    "productcategory": "Clothing"
+  },
+  {
+    "year": 2024,
+    "revenue": 148000,
+    "productcategory": "Home & Garden"
+  },
+  {
+    "year": 2024,
+    "revenue": 89000,
+    "productcategory": "Sports"
+  }
+]

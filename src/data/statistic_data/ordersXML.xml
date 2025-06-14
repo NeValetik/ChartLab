@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    <record>
+        <sales>550</sales>
+        <revenue>100</revenue>
+        <regions>Orhei</regions>
+    </record>
+    <record>
+        <sales>500</sales>
+        <revenue>20</revenue>
+        <regions>Chisinau</regions>
+    </record>
+    <record>
+        <sales>300</sales>
+        <revenue>10</revenue>
+        <regions>Ialoveni</regions>
+    </record>
+    <record>
+        <sales>1000</sales>
+        <revenue>200</revenue>
+        <regions>Bucuresti</regions>
+    </record>
+</dataset>
