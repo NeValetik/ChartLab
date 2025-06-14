@@ -36,7 +36,6 @@ class Reader:
     def read_csv(self, filename):
         try:
             full_path = self._get_full_path(filename)
-            print(f"READ:{full_path}")
             return pd.read_csv(full_path)
         except Exception as e:
             print(f"Error reading CSV file: {str(e)}")
@@ -70,8 +69,9 @@ class Reader:
     def read_xml(self, filename):
         try:
             full_path = self._get_full_path(filename)
-            df = pd.read_xml(full_path, dtype={'ID': str})
+            df = pd.read_xml(full_path, xpath=".//record")
             df = df.replace({np.nan: None})
+            return df
         except Exception as e:
             print(f"Error reading XML file: {str(e)}")
             return None
