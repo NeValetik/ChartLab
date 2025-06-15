@@ -512,18 +512,16 @@ def get_scatter_plot(df, x_col, y_col, point_size=15, marker_symbol="circle", la
 
     return pio.to_json(fig, pretty=True, remove_uids=True)
 
-def get_pie_chart(df, x_col, y_col):
+def get_pie_chart(df, x_col, y_col, chart_title=None, hole_size=0.35):
     # Convert y_col to numeric if it's not already
     if not pd.api.types.is_numeric_dtype(df[y_col]):
         # Clean and convert numeric values
         df[y_col] = (
             df[y_col]
             .astype(str)
-            .str.replace(r"[^\d.]", "", regex=True)  # Remove non-numeric chars
+            .str.replace(r"[^\d.]", "", regex=True)
             .pipe(pd.to_numeric, errors="coerce")
         )
-        
-        # Remove invalid rows
         df = df.dropna(subset=[y_col])
         if df.empty:
             raise ValueError(f"Column '{y_col}' contains no valid numeric data")
@@ -532,80 +530,105 @@ def get_pie_chart(df, x_col, y_col):
     if pd.api.types.is_numeric_dtype(df[x_col]):
         df[x_col] = df[x_col].astype(str).str.replace(r"\.0$", "", regex=True)
         
-    # Aggregate data
+    # Aggregate and sort data
     grouped_data = df.groupby(x_col)[y_col].sum().sort_values(ascending=False).reset_index()
+    total_value = float(grouped_data[y_col].sum())
+    
+    # Generate title if not provided
+    if chart_title is None:
+        chart_title = f"{y_col.title()} Distribution by {x_col.title()}"
 
-    # Generate professional color palette
-    colors = sns.color_palette("viridis", len(grouped_data))
-    hex_colors = [matplotlib.colors.rgb2hex(color) for color in colors]
-
-    # Create interactive pie chart
+    # Create pie chart
     fig = px.pie(
         grouped_data,
         names=x_col,
         values=y_col,
-        color_discrete_sequence=hex_colors,
-        hole=0.3,  # Creates a donut-style chart
+        color_discrete_sequence=px.colors.qualitative.Pastel,
+        hole=hole_size,
         hover_data={y_col: ':,.0f'}
     )
 
     # Customize traces
     fig.update_traces(
-        texttemplate='<b>%{label}</b><br>%{value:,.0f} (%{percent})',
-        textposition='auto',
-        insidetextorientation='radial',
-        marker=dict(
-            line=dict(color='white', width=1.5),
-        ),
+        texttemplate='<b>%{label}</b><br>%{value:,.0f} (%{percent:.1%})',
+        textposition='outside',
+        insidetextorientation='horizontal',
+        marker=dict(line=dict(color='white', width=1.8)),
         hovertemplate=(
             "<b>%{label}</b><br>"
             f"{y_col}: <b>%{{customdata[0]:,.0f}}</b><br>"
-            "Percentage: %{percent}<extra></extra>"
+            "Percentage: <b>%{percent:.1%}</b><extra></extra>"
         ),
-        pull=[0.05 if i == 0 else 0 for i in range(len(grouped_data))]  # Emphasize largest slice
+        pull=[0.03 if i < 3 else 0 for i in range(len(grouped_data))]
     )
 
-    total_value = float(grouped_data[y_col].sum())  # Ensure numeric type
-    total_str = f"{total_value:,.2f}".rstrip('0').rstrip('.')  # Clean format
+    # Format total value
+    total_str = f"{total_value:,.0f}" if total_value >= 1000 else f"{total_value:,.2f}".rstrip('0').rstrip('.')
 
-    # Professional layout configuration
+    # Enhanced layout with larger, edge-positioned legend
     fig.update_layout(
         title=dict(
-            text=f"<span style='font-size:24px; font-weight:600;'>{y_col} Distribution</span><br>"
-                 f"<span style='font-size:18px; color:#606060'>by {x_col}</span>",
-            x=0.03,
-            y=0.95,
-            xanchor='left',
-            yanchor='top'
+            text=f"<b>{chart_title}</b>",
+            x=0.5,
+            xanchor='center',
+            font=dict(size=22, family='Arial, sans-serif', color='#2c3e50'),
+            y=0.97
         ),
         annotations=[
             dict(
-                text=f"Total {y_col}:<br>{total_str}",
+                text=f"<b>Total {y_col}:</b><br>{total_str}",
                 x=0.5,
                 y=0.5,
-                font_size=16,
+                font_size=18,
                 showarrow=False,
-                font=dict(color='#606060')
+                font=dict(color='#4a4a4a', family='Arial, sans-serif')
             )
         ],
-        plot_bgcolor='white',
-        paper_bgcolor='#f8f9fa',
-        margin=dict(t=100, b=60, l=60, r=160),
-        font=dict(family='Poppins, Arial', color='#404040'),
+        plot_bgcolor='rgba(255,255,255,0)',
+        paper_bgcolor='rgba(255,255,255,0.9)',
+        margin=dict(t=80, b=30, l=30, r=180),  # Increased right margin for legend
+        font=dict(family='Segoe UI, sans-serif', size=12, color='#404040'),
         legend=dict(
-            title=dict(text=f"{x_col}:", font=dict(size=13)),
+            title=dict(
+                text=f"<b>{x_col.title()}:</b>", 
+                font=dict(size=14)  # Larger title
+            ),
             orientation='v',
-            yanchor='middle',
-            xanchor='right',
-            x=1.2,
+            yanchor='top',
+            xanchor='left',
+            x=1.15,  # Positioned closer to right edge
+            y=0.95,  # Aligned to top
+            bgcolor='rgba(255,255,255,0.7)',
+            bordercolor='rgba(200,200,200,0.4)',
+            borderwidth=1.5,
             itemclick=False,
-            itemdoubleclick=False
+            itemdoubleclick=False,
+            font=dict(  # Larger legend items
+                size=13,  # Increased from 12
+                family='Segoe UI, sans-serif'
+            ),
+            traceorder='normal',
+            itemsizing='constant'
         ),
+        uniformtext=dict(
+            minsize=10,
+            mode='hide',
+        )
+    )
+
+    # Add custom hover styling
+    fig.update_layout(
+        hoverlabel=dict(
+            bgcolor='rgba(255,255,255,0.95)',
+            bordercolor='rgba(200,200,200,0.5)',
+            font_size=12,
+            font_family="Arial, sans-serif"
+        )
     )
 
     return pio.to_json(fig, pretty=True, remove_uids=True)
 
-def get_area_chart(df, x_column, y_column, color_column, chart_title="Area Chart"):
+def get_area_chart(df, x_column, y_column, color_column, chart_title=None):
     required_columns = [x_column, y_column, color_column]
     missing_columns = [col for col in required_columns if col not in df.columns]
     
@@ -614,6 +637,11 @@ def get_area_chart(df, x_column, y_column, color_column, chart_title="Area Chart
         print(f"Available columns: {list(df.columns)}")
         return
     
+    # Generate dynamic title if not provided
+    if chart_title is None:
+        chart_title = f"{y_column.title()} by {color_column.title()} over {x_column.title()}"
+
+    # Create figure with refined aesthetics
     fig = px.area(df, 
                   x=x_column, 
                   y=y_column, 
@@ -623,38 +651,77 @@ def get_area_chart(df, x_column, y_column, color_column, chart_title="Area Chart
                       y_column: f'{y_column.title()} ($)',
                       x_column: x_column.title(),
                       color_column: color_column.title()
-                  })
-    
+                  },
+                  color_discrete_sequence=px.colors.qualitative.Pastel1,
+                  line_shape='spline')  # Smooth curves
+
+    # Enhanced layout with light background
     fig.update_layout(
         title={
-            'text': chart_title,
+            'text': f"<b>{chart_title}</b>",
             'x': 0.5,
             'xanchor': 'center',
-            'font': {'size': 20}
+            'font': {'size': 22, 'family': "Arial, sans-serif", 'color': '#2c3e50'}
         },
-        xaxis_title=x_column.title(),
-        yaxis_title=f'{y_column.title()} ($)',
-        font=dict(size=12),
+        xaxis_title=f"<b>{x_column.title()}</b>",
+        yaxis_title=f"<b>{y_column.title()} ($)</b>",
+        font=dict(size=12, family="Segoe UI, sans-serif", color='#2c3e50'),
         hovermode='x unified',
-        width=1000,
-        height=600,
+        width=1100,
+        height=650,
         showlegend=True,
         legend=dict(
+            title_text=f'<b>{color_column.title()}</b>',
             orientation="v",
             yanchor="top",
             y=0.99,
             xanchor="left",
-            x=0.01
+            x=0.01,
+            bgcolor='rgba(255,255,255,0.7)',
+            bordercolor='rgba(200,200,200,0.5)',
+            borderwidth=1,
+            itemclick='toggleothers'
+        ),
+        plot_bgcolor='rgba(252,252,255,1)',  # Near-white with subtle blue tone
+        paper_bgcolor='rgba(255,255,255,1)',  # Pure white outer background
+        margin=dict(t=70, b=60, l=60, r=40),
+        hoverlabel=dict(
+            bgcolor='rgba(255,255,255,0.95)',
+            font_size=12,
+            font_family="Arial",
+            bordercolor='rgba(200,200,200,0.5)'
         )
     )
     
-    fig.update_yaxes(tickformat='$,.0f')
+    # Axis and grid styling
+    fig.update_xaxes(
+        showgrid=True,
+        gridcolor='rgba(235, 235, 240, 0.9)',
+        linecolor='rgba(180,180,180,0.6)',
+        linewidth=1.5,
+        mirror=True,
+        showline=True
+    )
     
+    fig.update_yaxes(
+        tickformat='$,.0f',
+        showgrid=True,
+        gridcolor='rgba(235, 235, 240, 0.8)',
+        zerolinecolor='rgba(220,220,220,0.7)',
+        linecolor='rgba(180,180,180,0.6)',
+        linewidth=1.5,
+        mirror=True,
+        showline=True
+    )
+    
+    # Trace enhancements
     fig.update_traces(
         hovertemplate=f'<b>%{{fullData.name}}</b><br>' +
                      f'{x_column.title()}: %{{x}}<br>' +
                      f'{y_column.title()}: $%{{y:,.0f}}<br>' +
-                     '<extra></extra>'
+                     '<extra></extra>',
+        line=dict(width=2.2),  # Crisper borders
+        opacity=0.92  # Slightly more opaque for better color
     )
 
     return pio.to_json(fig, pretty=True, remove_uids=True)
