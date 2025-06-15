@@ -21,7 +21,7 @@ def generate_image():
     return jsonify({"plots": json_list})
 
 @app.route('/api/v1/get-templates', methods=['GET'])
-def list_files():
+def list_templates():
     files_content = []
     script_dir = os.path.dirname(os.path.abspath(__file__))
     repo_path = "data/templates"
@@ -31,6 +31,16 @@ def list_files():
         if os.path.isfile(file_path):
             with open(file_path, 'r', encoding='utf-8') as file:
                 files_content.append({"key":filename, "code": file.read(), "label":filename})
+    return jsonify(files_content)
+
+@app.route('/api/v1/get-statistic-data', methods=['GET'])
+def list_statistic_data():
+    files_content = []
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    repo_path = "data/statistic-data"
+    repo_path = os.path.join(script_dir, repo_path)
+    for filename in os.listdir(repo_path):
+        files_content.append({"key":filename})
     return jsonify(files_content)
 
 @app.route('/api/v1/save-template', methods=['POST'])
@@ -46,7 +56,7 @@ def save_template():
     return jsonify({"message": "Template saved successfully"}), 201
 
 @app.route('/api/v1/save-statistic-data', methods=['POST'])
-def save_data():
+def save_statistic_data():
     content = request.get_json()
     if not content:
         return jsonify({"error": "No data provided"}), 400
