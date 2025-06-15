@@ -55,32 +55,21 @@ def save_template():
 
     return jsonify({"message": "Template saved successfully"}), 201
 
-from werkzeug.utils import secure_filename
-import os
-
 @app.route('/api/v1/save-statistic-data', methods=['POST'])
 def save_statistic_data():
-    # Check if file part exists in request
     if 'file' not in request.files:
         return jsonify({"error": "No file part"}), 400
     
     file = request.files['file']
     
-    # Check if file was selected
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
     
-    # Get filename (either from form or original filename)
     filename = request.form.get('filename', file.filename)
     if not filename:
         return jsonify({"error": "Filename is required"}), 400
 
-
-    # Create target directory if it doesn't exist
-    save_dir = "src/data/statistic_data"
-    os.makedirs(save_dir, exist_ok=True)
-    
-    # Save file to filesystem
+    save_dir = "data/statistic_data"
     file_path = os.path.join(save_dir, filename)
     file.save(file_path)
     
