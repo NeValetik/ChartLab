@@ -61,7 +61,7 @@ def save_statistic_data():
     if not content:
         return jsonify({"error": "No data provided"}), 400
     
-    file_path = os.path.join("data/statistic_data", content["filename"])
+    file_path = os.path.join("src/data/statistic_data", content["filename"])
     with open(file_path, "w", encoding="utf-8") as file:
         file.write(content["code"])
 
