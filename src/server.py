@@ -30,17 +30,41 @@ def list_templates():
         file_path = os.path.join(repo_path, filename)
         if os.path.isfile(file_path):
             with open(file_path, 'r', encoding='utf-8') as file:
-                files_content.append({"key":filename, "code": file.read(), "label":filename})
+                files_content.append({
+                    "key":filename,
+                    "code": file.read(),
+                    "label":filename})
+
     return jsonify(files_content)
 
 @app.route('/api/v1/get-statistic-data', methods=['GET'])
-def list_statistic_data():
+def get_statistic_data():
+    ALLOWED_EXTENSIONS = {'.csv', '.json', '.xml'}
+    
     files_content = []
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    repo_path = "data/statistic-data"
-    repo_path = os.path.join(script_dir, repo_path)
+    repo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data/statistic_data")
+    
     for filename in os.listdir(repo_path):
-        files_content.append({"key":filename})
+        file_path = os.path.join(repo_path, filename)
+        if os.path.isfile(file_path):
+            _, ext = os.path.splitext(filename)
+            ext = ext.lower()
+            
+            if ext in ALLOWED_EXTENSIONS:
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as file:
+                        content = file.read()
+                except Exception as e:
+                    content = f"Error reading file: {str(e)}"
+            else:
+                content = None
+                
+            files_content.append({
+                "key": filename,
+                "code": content,
+                "label": filename
+            })
+    
     return jsonify(files_content)
 
 @app.route('/api/v1/save-template', methods=['POST'])
