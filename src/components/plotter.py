@@ -423,6 +423,10 @@ def get_scatter_plot(df, x_col, y_col, point_size=15, marker_symbol="circle", la
     color_palette = ['#1C0B85', '#8D2C8C', '#C7636B', '#EBAD51', '#1E88E5']
     choice = int(random.choice([0, 1, 2, 3, 4]))
     point_color = color_palette[choice]  # Consistently styled color (e.g., purple)
+    x_min = df[x_col].min()
+    x_max = df[x_col].max()
+    y_min = df[y_col].min()
+    y_max = df[y_col].max()
 
     # Define custom hovertemplate
     hover = f"<b>{x_col}</b>: %{{x}}<br><b>{y_col}</b>: %{{y}}"
@@ -496,15 +500,17 @@ def get_scatter_plot(df, x_col, y_col, point_size=15, marker_symbol="circle", la
     # Add dynamic annotation summary
     total_points = len(df)
     fig.add_annotation(
-        x=0.95,
-        y=0.98,
+        x=1,
+        y=1.15,
         xref="paper",
         yref="paper",
         text=f"<b>Total Points:</b> {total_points:,}<br>"
-             f"<b>Marker:</b> {marker_symbol.capitalize()}",
+             f"<b>Marker:</b> {marker_symbol.capitalize()}<br>"
+             f"<b>{x_col.capitalize()} Range:</b> {x_min} → {x_max}<br>"
+             f"<b>{y_col.capitalize()} Range:</b> {y_min} → {y_max}<br>",
         showarrow=False,
-        align="right",
         font=dict(size=12),
+        align='left',
         bgcolor="rgba(255,255,255,0.9)",
         bordercolor="#d0d0d0",
         borderwidth=1
@@ -755,11 +761,24 @@ def get_histogram(df, column, step):
         "Frequency": bin_counts.values
     })
 
+    # === CUSTOM COLORS ===
+    unique_stacks = len(hist_data)  # number of bars = number of ranges
+    colors = sns.color_palette("PuRd", unique_stacks + 2)[2:]
+    colors = [sns.desaturate(c, 0.5) for c in colors]  # make colors softer
+    colors = [(min(1, r + 0.15), min(1, g + 0.15), min(1, b + 0.15)) for (r, g, b) in colors]  # brighten
+    hex_colors = [matplotlib.colors.rgb2hex(c) for c in colors]
+
+    # Add a dummy column to use for color mapping
+    hist_data["Color"] = hist_data["Range"]
+
     # Create Plotly Express bar chart
     fig = px.bar(
         hist_data,
         x="Range",
         y="Frequency",
+        color="Color",  # Trick to allow per-bar color
+        color_discrete_sequence=hex_colors,
+        hover_data={'Color': False}
     )
 
     # Update layout for styling
@@ -796,6 +815,7 @@ def get_histogram(df, column, step):
             font_size=14
         ),
         separators=',.',
+        showlegend=False,  # Hide legend since color is only used for styling
         annotations=[
             dict(
                 x=0.95,
