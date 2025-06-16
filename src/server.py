@@ -8,56 +8,67 @@ from components.interpretor import *
 
 app = Flask(__name__)
 
+# Get base directory once at startup
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TEMPLATES_DIR = os.path.join(BASE_DIR, 'data', 'templates')
+STATISTIC_DATA_DIR = os.path.join(BASE_DIR, 'data', 'statistic_data')
+
+# Ensure directories exist
+os.makedirs(TEMPLATES_DIR, exist_ok=True)
+os.makedirs(STATISTIC_DATA_DIR, exist_ok=True)
+
 @app.route('/api/v1/get-chart', methods=['POST'])
 def generate_image():
     content = request.get_json()
     if not content:
-        return jsonify("No text provided", 400)
+        return jsonify("No text provided"), 400
 
     json_list = create_chart(content["code"])
     if json_list is None:
-        return jsonify("Internal Error: No json_list was returned.", 400)
+        return jsonify("Internal Error: No json_list was returned."), 400
 
     return jsonify({"plots": json_list})
 
 @app.route('/api/v1/get-templates', methods=['GET'])
 def list_templates():
     files_content = []
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    repo_path = os.path.join('data', 'templates')
-    repo_path = os.path.join(script_dir, repo_path)
-    for filename in os.listdir(repo_path):
-        file_path = os.path.join(repo_path, filename)
+    for filename in os.listdir(TEMPLATES_DIR):
+        file_path = os.path.join(TEMPLATES_DIR, filename)
         if os.path.isfile(file_path):
-            with open(file_path, 'r', encoding='utf-8') as file:
+            try:
+                with open(file_path, 'r', encoding='utf-8') as file:
+                    files_content.append({
+                        "key": filename,
+                        "code": file.read(),
+                        "label": filename
+                    })
+            except Exception as e:
                 files_content.append({
-                    "key":filename,
-                    "code": file.read(),
-                    "label":filename})
-
+                    "key": filename,
+                    "code": f"Error reading file: {str(e)}",
+                    "label": filename
+                })
     return jsonify(files_content)
 
 @app.route('/api/v1/get-statistic-data', methods=['GET'])
 def get_statistic_data():
     ALLOWED_EXTENSIONS = {'.csv', '.json', '.xml'}
-    
     files_content = []
-    repo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.path.join('data', 'statistic_data'))
     
-    for filename in os.listdir(repo_path):
-        file_path = os.path.join(repo_path, filename)
+    for filename in os.listdir(STATISTIC_DATA_DIR):
+        file_path = os.path.join(STATISTIC_DATA_DIR, filename)
         if os.path.isfile(file_path):
             _, ext = os.path.splitext(filename)
             ext = ext.lower()
             
-            if ext in ALLOWED_EXTENSIONS:
-                try:
+            try:
+                if ext in ALLOWED_EXTENSIONS:
                     with open(file_path, 'r', encoding='utf-8') as file:
                         content = file.read()
-                except Exception as e:
-                    content = f"Error reading file: {str(e)}"
-            else:
-                content = None
+                else:
+                    content = None
+            except Exception as e:
+                content = f"Error reading file: {str(e)}"
                 
             files_content.append({
                 "key": filename,
@@ -70,12 +81,21 @@ def get_statistic_data():
 @app.route('/api/v1/save-template', methods=['POST'])
 def save_template():
     content = request.get_json()
-    if not content:
-        return jsonify({"error": "No data provided"}), 400
+    if not content or "filename" not in content or "code" not in content:
+        return jsonify({"error": "Missing required data"}), 400
     
-    file_path = os.path.join(os.path.join('src', 'data', 'templates'), content["filename"])
-    with open(file_path, "w", encoding="utf-8") as file:
-        file.write(content["code"])
+    # Sanitize filename to prevent path traversal
+    filename = os.path.basename(content["filename"])
+    if not filename:
+        return jsonify({"error": "Invalid filename"}), 400
+        
+    file_path = os.path.join(TEMPLATES_DIR, filename)
+    
+    try:
+        with open(file_path, "w", encoding="utf-8") as file:
+            file.write(content["code"])
+    except Exception as e:
+        return jsonify({"error": f"Failed to save template: {str(e)}"}), 500
 
     return jsonify({"message": "Template saved successfully"}), 201
 
@@ -85,17 +105,19 @@ def save_statistic_data():
         return jsonify({"error": "No file part"}), 400
     
     file = request.files['file']
-    
-    if file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
-    
     filename = request.form.get('filename', file.filename)
-    if not filename:
-        return jsonify({"error": "Filename is required"}), 400
-
-    save_dir = "src/data/statistic_data"
-    file_path = os.path.join(save_dir, filename)
-    file.save(file_path)
+    
+    if not filename or file.filename == '':
+        return jsonify({"error": "No valid filename provided"}), 400
+    
+    # Sanitize filename
+    filename = os.path.basename(filename)
+    file_path = os.path.join(STATISTIC_DATA_DIR, filename)
+    
+    try:
+        file.save(file_path)
+    except Exception as e:
+        return jsonify({"error": f"Failed to save file: {str(e)}"}), 500
     
     return jsonify({"message": "File saved successfully"}), 201
 
