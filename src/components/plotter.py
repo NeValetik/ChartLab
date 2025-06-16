@@ -7,62 +7,15 @@ import plotly.io as pio
 from matplotlib import pyplot as plt
 
 def get_comparison(df, value_col, category_col):
-    # Sort and aggregate data
     grouped_data = df.groupby(category_col)[value_col].sum().sort_values(ascending=False).reset_index()
-
-    # Generate colors using seaborn's viridis palette
-    colors = sns.color_palette("viridis", len(grouped_data))
-    hex_colors = [matplotlib.colors.rgb2hex(color) for color in colors]
+    
+    # Modern sequential color scale with better contrast
+    color_scale = ['#1A237E', '#3949AB', '#5E35B1', '#7E57C2', '#9C27B0']
+    max_value = grouped_data[value_col].max()
+    total_value = grouped_data[value_col].sum()
+    num_categories = len(grouped_data)
 
     # Create interactive bar plot
-    fig = px.bar(
-        grouped_data,
-        x=category_col,
-        y=value_col,
-        color=category_col,
-        color_discrete_sequence=hex_colors
-    )
-
-    # Customize the plot
-    fig.update_traces(
-        texttemplate='%{y:,.0f}',
-        textposition='outside',
-        marker=dict(opacity=0.85)
-    )
-
-    fig.update_layout(
-        title=dict(
-            text=f"Comparison of {value_col} across {category_col}",
-            font=dict(size=16, family="Arial", color="black")
-        ),
-        xaxis=dict(
-            title=dict(text=category_col, font=dict(size=14, family="Arial")),
-            tickangle=-45,
-            tickfont=dict(size=12)
-        ),
-        yaxis=dict(
-            title=dict(text=value_col, font=dict(size=14, family="Arial")),
-            gridcolor="lightgray",
-            gridwidth=0.5,
-            showgrid=True
-        ),
-        plot_bgcolor="white",
-        showlegend=False,
-        margin=dict(t=60, b=100)
-    )
-
-    return pio.to_json(fig, pretty=True, remove_uids=True)
-
-def get_comaprison(df, value_col, category_col):
-    # Sort and aggregate data
-    grouped_data = df.groupby(category_col)[value_col].sum().sort_values(ascending=False).reset_index()
-    
-    # Create dynamic color scale with smooth transitions
-    # color_scale = px.colors.cyclical.Twilight
-    color_scale = ['#1C0B85', '#8D2C8C', '#C7636B', '#EBAD51', '#F1F45B']
-    max_value = grouped_data[value_col].max()
-    
-    # Create interactive bar plot with advanced styling
     fig = px.bar(
         grouped_data,
         x=category_col,
@@ -71,119 +24,132 @@ def get_comaprison(df, value_col, category_col):
         color_continuous_scale=color_scale,
         text=value_col,
         hover_data={value_col: ':,.0f'},
-        height=700,
-        template='plotly_white+presentation',
+        height=650,
+        template='plotly_white',
         hover_name=category_col,
-        range_y=[0, max_value * 1.15]
+        range_y=[0, max_value * 1.2]
     )
 
-    # Custom text positioning with dynamic threshold
-    text_position = ['outside' if val < 0.15 * max_value else 'inside' for val in grouped_data[value_col]]
+    # Dynamic text positioning
+    text_position = ['outside' if val < 0.1 * max_value else 'inside' for val in grouped_data[value_col]]
     
-    # Update traces with advanced styling
+    # Update traces with enhanced styling
     fig.update_traces(
         texttemplate='<b>%{text:,.0f}</b>',
         textposition=text_position,
-        textfont_size=14,
-        textfont_color=['white' if pos == 'inside' else '#404040' for pos in text_position],
+        textfont_size=12,
+        textfont_color=['white' if pos == 'inside' else '#2C2C2C' for pos in text_position],
         marker=dict(
-            opacity=0.92,
-            line=dict(width=2, color='white'),
+            opacity=0.95,
+            line=dict(width=1.5, color='rgba(255,255,255,0.8)'),
+            cornerradius=4
         ),
         hovertemplate=(
-            "<b>%{hovertext}</b><br><br>"
+            "<b>%{hovertext}</b><br>"
             f"{value_col}: <b>%{{y:,.0f}}</b><br>"
-            "<extra></extra>"
+            "Share: <b>%{y:,.1%}</b><extra></extra>"
         ),
         hoverlabel=dict(
             bgcolor='white',
-            bordercolor='#404040',
-            font_size=14
+            bordercolor='rgba(150,150,150,0.5)',
+            font_size=12,
+            font_family="Arial"
         )
     )
 
-    # Advanced layout configuration
+    # Enhanced layout configuration with explicit axes
     fig.update_layout(
         title=dict(
-            text=f"<span style='font-size:26px; font-weight:600;'>{value_col} ANALYSIS</span><br>"
-                 f"<span style='font-size:18px; color:#606060'>{category_col} Distribution</span>",
-            x=0.03,
-            y=0.93,
+            text=f"<span style='font-size:24px; font-weight:700;'>{value_col.capitalize()} Analysis</span><br>"
+                 f"<span style='font-size:16px; color:#5A5A5A'>Distribution by {category_col.capitalize()}</span>",
+            x=0.05,
+            y=0.99,
             xanchor='left',
-            yanchor='top'
+            yanchor='top',
+            pad=dict(t=40, b=20)
         ),
         xaxis=dict(
-            title=None,
-            tickfont=dict(size=14, color='#606060', family='Poppins'),
-            gridcolor='rgba(200, 200, 200, 0.1)',
-            linecolor='#d0d0d0',
+            title=dict(
+                text=f"<b>{category_col.capitalize()}</b>",
+                font=dict(size=14, color='#000000', family='Segoe UI')
+            ),
+            tickfont=dict(size=12, color='#000000', family='Segoe UI'),
             showgrid=False,
-            automargin=True
+            automargin=True,
+            tickangle=-30,
+            linecolor='#d0d0d0',
+            linewidth=1.5
         ),
         yaxis=dict(
-            title=None,
-            gridcolor='rgba(200, 200, 200, 0.2)',
+            title=dict(
+                text=f"<b>{value_col.capitalize()}</b>",
+                font=dict(size=14, color='#000000', family='Segoe UI'),
+                standoff=15
+            ),
+            gridcolor='rgba(200, 200, 200, 0.3)',
             showgrid=True,
-            zeroline=False,
+            zeroline=True,
+            zerolinecolor='#d0d0d0',
+            zerolinewidth=1,
             tickformat=',.0f',
-            tickfont=dict(size=12, color='#808080')
+            tickfont=dict(size=11, color='#000000'),
+            showticklabels=True,
+            linecolor='#d0d0d0',
+            linewidth=1.5,
+            rangemode='tozero'
         ),
         coloraxis=dict(
             colorbar=dict(
-                title=dict(text=f"{value_col} Scale", font=dict(size=12)),
+                title=dict(text=f"{value_col.capitalize()} Value", font=dict(size=11)),
                 tickfont=dict(size=10),
-                xpad=20,
-                ypad=0
+                thickness=12,
+                len=0.6,
+                xpad=10
             )
         ),
-        plot_bgcolor='rgba(255, 255, 255, 0.95)',
-        paper_bgcolor='#f8f9fa',
-        margin=dict(t=120, b=100, l=60, r=40),
-        font=dict(family='Poppins, Arial', color='#404040'),
+        plot_bgcolor='rgba(255, 255, 255, 1.0)',  # Keep chart area white
+        paper_bgcolor='rgba(248,248,251,1)',  # Set the surrounding area color
+        margin=dict(t=120, b=100, l=80, r=40),
+        font=dict(family='Segoe UI, Arial', color='#404040'),
         separators=',.',
-        bargap=0.2,
-        bargroupgap=0.05,
-        hoverdistance=100,
-        annotations=[
-            dict(
-                x=0.98,
-                y=1.12,
-                xref='paper',
-                yref='paper',
-                text="VISUAL ANALYTICS DASHBOARD",
-                showarrow=False,
-                font=dict(size=16, color='#a0a0a0')
-            )
-        ]
+        bargap=0.4,
+        hovermode='x unified',
     )
 
-    # Add decorative elements
+    # Add professional design elements
     fig.add_shape(
         type="rect",
         xref="paper",
         yref="paper",
         x0=0, y0=0,
         x1=1, y1=1,
-        line=dict(color="#e0e0e0", width=2),
+        line=dict(color="#EAEAEA", width=1),
         fillcolor="rgba(0,0,0,0)"
     )
-
-    # Add dynamic data summary
-    total_value = grouped_data[value_col].sum()
+    
+    # Add source annotation
     fig.add_annotation(
-        x=0.95,
-        y=0.98,
+        x=0.98,
+        y=-0.18,
         xref="paper",
         yref="paper",
-        text=f"<b>Total {value_col}:</b> {total_value:,.0f}<br>"
-             f"<b>Max Value:</b> {max_value:,.0f}",
+        text="Source: Business Intelligence Dashboard",
         showarrow=False,
-        align="right",
-        font=dict(size=12),
-        bgcolor="rgba(255,255,255,0.9)",
-        bordercolor="#d0d0d0",
-        borderwidth=1
+        font=dict(size=10, color="#A0A0A0"),
+        align="right"
     )
+
+    # Add percentage labels for top bars
+    for i, row in enumerate(grouped_data.itertuples()):
+        if row[2] > 0.1 * max_value:
+            fig.add_annotation(
+                x=row[1],
+                y=row[2] + 0.03 * max_value,
+                text=f"{(row[2]/total_value):.1%}",
+                showarrow=False,
+                font=dict(size=10, color="#606060"),
+                yanchor="bottom"
+            )
 
     return pio.to_json(fig, pretty=True, remove_uids=True)
 
