@@ -24,7 +24,7 @@ def generate_image():
 def list_templates():
     files_content = []
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    repo_path = "data/templates"
+    repo_path = os.path.join('data', 'templates')
     repo_path = os.path.join(script_dir, repo_path)
     for filename in os.listdir(repo_path):
         file_path = os.path.join(repo_path, filename)
@@ -42,7 +42,7 @@ def get_statistic_data():
     ALLOWED_EXTENSIONS = {'.csv', '.json', '.xml'}
     
     files_content = []
-    repo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data/statistic_data")
+    repo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.path.join('data', 'statistic_data'))
     
     for filename in os.listdir(repo_path):
         file_path = os.path.join(repo_path, filename)
@@ -73,7 +73,7 @@ def save_template():
     if not content:
         return jsonify({"error": "No data provided"}), 400
     
-    file_path = os.path.join("src/data/templates", content["filename"])
+    file_path = os.path.join(os.path.join('src', 'data', 'templates'), content["filename"])
     with open(file_path, "w", encoding="utf-8") as file:
         file.write(content["code"])
 
