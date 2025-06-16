@@ -167,13 +167,13 @@ def get_line_graph(df, x_col, y_col):
 
     # Customize the plot
     fig.update_traces(
-        line=dict(color="blue", width=2.5),
+        line=dict(shape="spline", color="#82314e", width=2.5),
         hovertemplate="<b>Date</b>: %{x|%Y-%m-%d}<br><b>Value</b>: %{y}<extra></extra>"
     )
 
     fig.update_layout(
         title=dict(
-            text=f"Trend of {x_col} Over Time",
+            text=f"Trend of {x_col} Over {y_col}",
             font=dict(size=16, family="Arial", color="black")
         ),
         xaxis=dict(
@@ -189,7 +189,7 @@ def get_line_graph(df, x_col, y_col):
             gridwidth=0.5,
             showgrid=True
         ),
-        plot_bgcolor="white",
+        plot_bgcolor="rgba(248, 248, 255, 1)",
         hovermode="x unified",
         margin=dict(t=60, b=100),
         legend=dict(
