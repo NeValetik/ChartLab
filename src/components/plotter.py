@@ -808,7 +808,7 @@ def get_bubble(df, x_col, y_col, size_col, category_col):
     df[size_col] = pd.to_numeric(df[size_col], errors='coerce').fillna(0)
 
     # Normalize bubble sizes to enhance visual consistency
-    size_scale = 3000 * df[size_col] / df[size_col].max()
+    # size_scale = 3000 * df[size_col] / df[size_col].max()
 
     # Generate colors using seaborn's palette
     unique_categories = df[category_col].nunique()
@@ -827,12 +827,12 @@ def get_bubble(df, x_col, y_col, size_col, category_col):
         size=size_col,
         color=category_col,
         text=category_col,
-        size_max=60,
+        size_max=120,
         color_discrete_sequence=hex_colors,
         hover_name=category_col,
         hover_data={x_col: True, y_col: True, size_col: ':.0f'},
         template='plotly_white',
-        opacity=0.85
+        opacity=0.65
     )
 
     # Update traces
